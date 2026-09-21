@@ -63,7 +63,9 @@ create table conversation (
   contact_name  text,
   contact_email text,
   contact_phone text,
-  summary       jsonb
+  summary       jsonb,
+  summary_updated_at timestamptz,
+  summary_input_hash text
 );
 
 create table message (
@@ -107,31 +109,62 @@ acumular. Salvar apenas no final descartaria justamente o caso comum.
 4. carrega o histórico e monta `[system, ...histórico]`
 5. abre o stream contra o VPS e repassa ao navegador
 6. ao fechar o stream, grava a resposta do assistente
-7. agenda a extração via `waitUntil` quando aplicável
 
-O visitante vê texto aparecendo token a token; nada da etapa 7 bloqueia a resposta.
+Nenhuma extração acontece aqui. Enquanto o visitante conversa, a GPU do VPS atende
+só a conversa.
 
 ## Extração do resumo
 
-Chamada separada ao mesmo modelo, com o transcript inteiro e um pedido de JSON.
-Roda a partir da terceira mensagem do usuário e a cada dois turnos depois disso,
-sempre sobrescrevendo `summary` — o resumo reflete o estado atual da conversa, não
-um momento final que pode nunca chegar.
+Chamada separada ao mesmo modelo, com o transcript inteiro e um pedido de JSON, feita
+por `POST /api/summarize`. Contato sai no mesmo JSON: quando vier preenchido, grava
+nas colunas de contato e move `status` para `com_contato`.
 
-Contato sai no mesmo JSON. Quando vier preenchido, grava nas colunas de contato e
-move `status` para `com_contato`.
+### Debounce
 
-**Sem tool calling.** Suporte a function calling varia entre modelos abertos e entre
-servidores; um pedido de JSON em texto funciona em qualquer endpoint compatível. O
-parser é tolerante por consequência: aceita JSON cercado por cerca de código ou por
-texto solto, e um resumo que falha a extração deixa o registro anterior intacto em
-vez de apagá-lo.
+A extração é debounced no cliente, na borda de saída. Um timer de 45 s reinicia a cada
+mensagem enviada; dispara quando o visitante para de responder, ou imediatamente se a
+aba for escondida ou fechada. A chamada usa `fetch` com `keepalive: true`, que
+sobrevive ao descarregamento da página.
+
+Uma conversa de dez mensagens seguidas produz uma extração, ao final — não uma a cada
+par de turnos competindo com o streaming.
+
+### Guarda no servidor
+
+O cliente não é confiável, então a rota decide sozinha se vale chamar o modelo. Duas
+condições, ambas obrigatórias:
+
+- passaram 60 s desde `summary_updated_at`
+- o SHA-256 do transcript difere de `summary_input_hash`
+
+Falhando qualquer uma, a rota responde sem tocar no modelo. Bater em `/api/summarize`
+em loop custa uma query, não uma inferência.
+
+### Conversas sem resumo
+
+Um navegador que morre sem disparar nada deixa transcript salvo e resumo defasado. O
+painel mostra essas conversas marcadas como desatualizadas, com um botão que gera o
+resumo na hora.
+
+A GPU trabalha quando alguém vai de fato ler o lead. Conversa de curioso que ninguém
+abre nunca consome inferência nenhuma.
+
+### Sem tool calling
+
+Suporte a function calling varia entre modelos abertos e entre servidores; um pedido
+de JSON em texto funciona em qualquer endpoint compatível. O parser é tolerante por
+consequência: aceita JSON cercado por cerca de código ou por texto solto, e um resumo
+que falha a extração deixa o registro anterior intacto em vez de apagá-lo.
 
 ## Painel
 
 `/admin`, protegido por Basic Auth em `middleware.ts` contra `ADMIN_PASSWORD`. Lista
 as conversas mais recentes com data, status, contato e a dor principal do resumo;
 abrir uma mostra o transcript completo e o JSON.
+
+Conversa cujo `summary_input_hash` não bate com o transcript atual aparece marcada
+como desatualizada e traz um botão que chama `/api/summarize` para aquela conversa,
+ignorando o cooldown — o pedido partiu de vocês, não de um cliente anônimo.
 
 Basic Auth é suficiente aqui: o painel não tem escrita e o protótipo tem três
 usuários. Login próprio seria cerimônia sem ganho.
@@ -143,6 +176,7 @@ usuários. Login próprio seria cerimônia sem ganho.
 | Conversas novas por IP | 5 por hora | `lib/rate-limit.ts` |
 | Mensagens do usuário por conversa | 40 | `lib/rate-limit.ts` |
 | Caracteres por mensagem | 2000 | validação na rota |
+| Extrações por conversa | 1 a cada 60 s | `/api/summarize` |
 
 Os tetos vivem no banco, não em memória — processo serverless não guarda estado entre
 requisições. Ao estourar, o bot responde uma frase encerrando com educação; não
@@ -172,6 +206,8 @@ Vitest, cobrindo o que quebra em silêncio:
 
 - parser tolerante da extração — JSON limpo, em cerca de código, cercado de texto,
   malformado, e o caso em que a falha preserva o resumo anterior
+- guarda de `/api/summarize` — dentro do cooldown, fora do cooldown, hash igual, hash
+  diferente, e o pedido do painel que ignora o cooldown
 - montagem do system prompt — persona e roteiro presentes, histórico na ordem certa
 - rate limit — dentro do teto, no teto, acima do teto
 - gravação incremental — mensagem do usuário persiste mesmo se a chamada ao modelo falhar
@@ -185,7 +221,7 @@ rodada manual antes do deploy faz.
 |---|---|
 | VPS fora do ar ou timeout | mensagem pedindo para tentar de novo; a mensagem do usuário já está salva |
 | Stream corta no meio | grava o parcial recebido e marca a mensagem como incompleta |
-| Extração falha | silenciosa; `summary` anterior permanece |
+| Extração falha | silenciosa; `summary` e o hash anteriores permanecem, então o painel segue oferecendo gerar de novo |
 | Banco indisponível | a conversa continua na tela; a perda é registrada no log da função |
 
 A conversa nunca morre por falha de infraestrutura secundária. Só a indisponibilidade
