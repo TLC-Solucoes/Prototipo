@@ -21,21 +21,23 @@ Next.js (App Router) + TypeScript + Tailwind, deploy na Vercel.
 
 ```
 visitante → / (chat)
-              ↓
-         POST /api/chat  ──stream──→ VPS (API OpenAI-compatible)
-              ↓
-         Neon Postgres ←── extração do resumo (waitUntil, pós-stream)
-              ↑
-         /admin (basic auth)
+              │
+              ├─ POST /api/chat ──────stream─────→ VPS (API OpenAI-compatible)
+              │        ↓                                      ↑
+              │   Neon Postgres                               │
+              │        ↑                                      │
+              └─ POST /api/summarize ──(debounce + guarda)────┘
+                       ↑
+                  /admin (basic auth)
 ```
 
 Uma rota visível para o público (`/`) e uma interna (`/admin`). Nada mais.
 
 ### Runtime
 
-Node, não Edge. O driver serverless do Neon roda nos dois, mas `waitUntil` e o SDK
-`openai` são mais previsíveis em Node, e o ganho de latência do Edge é irrelevante
-diante do tempo do modelo.
+Node, não Edge. O driver serverless do Neon roda nos dois, mas o SDK `openai` é mais
+previsível em Node, e o ganho de latência do Edge é irrelevante diante do tempo que o
+modelo leva para responder.
 
 ### Camadas
 
