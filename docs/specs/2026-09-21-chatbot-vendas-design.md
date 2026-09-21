@@ -45,7 +45,9 @@ modelo leva para responder.
 |---|---|---|
 | `lib/llm.ts` | falar com o VPS: streaming e chamada simples | SDK `openai`, env |
 | `lib/prompt.ts` | montar o system prompt a partir da persona e do roteiro | — |
-| `lib/extract.ts` | transformar transcript em resumo estruturado; parse tolerante | `lib/llm.ts` |
+| `lib/summary.ts` | tipos do resumo e parse tolerante do JSON | — |
+| `lib/summarize.ts` | transformar transcript em resumo e gravá-lo | `lib/llm.ts`, `lib/db.ts` |
+| `lib/summarize-guard.ts` | decidir se vale chamar o modelo | — |
 | `lib/db.ts` | todas as queries; nenhum SQL fora daqui | `@neondatabase/serverless` |
 | `lib/rate-limit.ts` | tetos por IP e por conversa | `lib/db.ts` |
 | `lib/session.ts` | cookie httpOnly com o id da conversa | — |
