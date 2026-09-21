@@ -383,7 +383,7 @@ console.log(`aplicados ${statements.length} comandos`)
 Adicionar em `package.json`, dentro de `scripts`:
 
 ```json
-"db:migrate": "node --env-file=.env.local --experimental-strip-types scripts/migrate.ts"
+"db:migrate": "node --env-file=.env.local scripts/migrate.ts"
 ```
 
 - [ ] **Step 5: Verificar a tipagem**
@@ -495,7 +495,7 @@ export function hashTranscript(
 - [ ] **Step 4: Rodar os testes**
 
 Run: `npx vitest run lib/__tests__/hash.test.ts`
-Expected: PASS, 7 testes.
+Expected: PASS, 6 testes.
 
 - [ ] **Step 5: Commit**
 
