@@ -28,7 +28,8 @@ export default async function Conversa({
 
   const mensagens = await listMessages(id)
   const resumo = conversa.summary
-  const desatualizado = conversa.summaryInputHash !== hashTranscript(mensagens)
+  const desatualizado =
+    resumo !== null && conversa.summaryInputHash !== hashTranscript(mensagens)
 
   const valores: (string | null)[] = [
     resumo?.segmento ?? null,
