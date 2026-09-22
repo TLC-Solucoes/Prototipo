@@ -172,6 +172,7 @@ export function Chat() {
         </form>
         <p className="mx-auto mt-2.5 max-w-[680px] text-center text-[11px] text-[#6F6A62] sm:text-[12px]">
           Suas respostas ficam com a TLC Soluções e servem pra montar sua proposta.
+          Este assistente não passa preço nem prazo.
         </p>
       </div>
     </div>
