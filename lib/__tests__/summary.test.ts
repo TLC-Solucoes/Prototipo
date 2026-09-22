@@ -68,4 +68,25 @@ describe('parseSummary', () => {
     expect(s?.contato.nome).toBeNull()
     expect(s?.contato.telefone).toBeNull()
   })
+
+  it('escolhe o objeto certo quando vem prosa com chaves depois do json', () => {
+    const s = parseSummary(`Segue o resumo:\n${completo}\nEspero ter ajudado! {abraços}`)
+    expect(s?.dorPrincipal).toBe('Confirmação de consulta uma a uma no WhatsApp')
+  })
+
+  it('prefere o resumo mais completo quando vêm dois objetos', () => {
+    const rascunho = JSON.stringify({ segmento: 'Clínica' })
+    const s = parseSummary(`${rascunho}\n\nCorrigindo:\n${completo}`)
+    expect(s?.contato.nome).toBe('Marina')
+    expect(s?.tempoGasto).toBe('2 h por dia')
+  })
+
+  it('ignora chaves dentro de string sem se perder', () => {
+    const s = parseSummary('{"segmento": "Empresa {ABC} Ltda", "ferramentas": []}')
+    expect(s?.segmento).toBe('Empresa {ABC} Ltda')
+  })
+
+  it('continua devolvendo null para json malformado', () => {
+    expect(parseSummary('{ "segmento": "Loja", ')).toBeNull()
+  })
 })

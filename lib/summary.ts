@@ -36,16 +36,64 @@ function lista(value: unknown): string[] {
   return unico ? [unico] : []
 }
 
-function extrairJson(raw: string): unknown {
-  const semCerca = raw.replace(/```(?:json)?/gi, '')
-  const inicio = semCerca.indexOf('{')
-  const fim = semCerca.lastIndexOf('}')
-  if (inicio === -1 || fim === -1 || fim <= inicio) return null
-  try {
-    return JSON.parse(semCerca.slice(inicio, fim + 1))
-  } catch {
-    return null
+const CHAVES_CONHECIDAS = [
+  'segmento', 'porte', 'papel', 'dorPrincipal', 'frequencia', 'tempoGasto',
+  'responsavel', 'consequencia', 'ferramentas', 'urgencia', 'adequacaoIcp',
+  'contato',
+]
+
+function candidatosJson(raw: string): string[] {
+  const candidatos: string[] = []
+  let profundidade = 0
+  let inicio = -1
+  let dentroDeString = false
+  let escapado = false
+
+  for (let i = 0; i < raw.length; i++) {
+    const caractere = raw[i]
+    if (dentroDeString) {
+      if (escapado) escapado = false
+      else if (caractere === '\\') escapado = true
+      else if (caractere === '"') dentroDeString = false
+      continue
+    }
+    if (caractere === '"') {
+      dentroDeString = true
+    } else if (caractere === '{') {
+      if (profundidade === 0) inicio = i
+      profundidade++
+    } else if (caractere === '}' && profundidade > 0) {
+      profundidade--
+      if (profundidade === 0) {
+        candidatos.push(raw.slice(inicio, i + 1))
+      }
+    }
   }
+  return candidatos
+}
+
+function extrairJson(raw: string): unknown {
+  let escolhido: Record<string, unknown> | null = null
+  let melhorPontuacao = -1
+
+  for (const candidato of candidatosJson(raw)) {
+    let valor: unknown
+    try {
+      valor = JSON.parse(candidato)
+    } catch {
+      continue
+    }
+    if (valor === null || typeof valor !== 'object' || Array.isArray(valor)) continue
+
+    const objeto = valor as Record<string, unknown>
+    const pontuacao = CHAVES_CONHECIDAS.filter((chave) => chave in objeto).length
+    if (pontuacao >= melhorPontuacao) {
+      melhorPontuacao = pontuacao
+      escolhido = objeto
+    }
+  }
+
+  return escolhido
 }
 
 export function parseSummary(raw: string): Summary | null {
