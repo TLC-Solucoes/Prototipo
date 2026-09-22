@@ -48,5 +48,6 @@ export type AdminRow = {
   contactPhone: string | null
   dorPrincipal: string | null
   messageCount: number
-  summaryInputHash: string | null
+  temResumo: boolean
+  desatualizado: boolean
 }

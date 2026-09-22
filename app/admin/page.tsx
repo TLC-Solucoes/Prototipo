@@ -14,7 +14,7 @@ const formatador = new Intl.DateTimeFormat('pt-BR', {
 export default async function Painel() {
   const conversas = await listConversations(100)
   const comContato = conversas.filter((c) => c.status === 'com_contato').length
-  const semResumo = conversas.filter((c) => c.dorPrincipal === null).length
+  const semResumo = conversas.filter((c) => !c.temResumo).length
 
   return (
     <div className="min-h-dvh px-5 py-7 sm:px-10">
@@ -61,13 +61,23 @@ export default async function Painel() {
             <span className="w-[160px] shrink-0 text-[15px] font-semibold">
               {conversa.contactName ?? '—'}
             </span>
-            <span className="min-w-0 flex-1 text-[15px] text-[#E6E1D8]">
-              {conversa.dorPrincipal ?? (
-                <span className="flex items-center gap-2.5">
-                  <em className="not-italic text-[#6F6A62]">sem resumo</em>
-                  <BotaoResumo id={conversa.id} rotulo="Gerar resumo" />
-                </span>
+            <span className="flex min-w-0 flex-1 items-center gap-2.5 text-[15px] text-[#E6E1D8]">
+              {conversa.temResumo ? (
+                <span className="min-w-0 truncate">{conversa.dorPrincipal ?? '—'}</span>
+              ) : (
+                <em className="not-italic text-[#6F6A62]">sem resumo</em>
               )}
+              {conversa.desatualizado ? (
+                <>
+                  {conversa.temResumo ? (
+                    <em className="shrink-0 not-italic text-[#6F6A62]">desatualizado</em>
+                  ) : null}
+                  <BotaoResumo
+                    id={conversa.id}
+                    rotulo={conversa.temResumo ? 'Atualizar' : 'Gerar resumo'}
+                  />
+                </>
+              ) : null}
             </span>
             <span className="w-10 shrink-0 text-right text-[14px] text-[#A19A8E]">
               {conversa.messageCount}

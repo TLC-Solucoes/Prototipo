@@ -127,7 +127,9 @@ export async function listConversations(limit: number): Promise<AdminRow[]> {
   const rows = await sql`
     select c.id, c.created_at, c.status, c.contact_name, c.contact_email,
            c.contact_phone, c.summary ->> 'dorPrincipal' as dor_principal,
-           c.summary_input_hash,
+           c.summary is not null as tem_resumo,
+           (c.summary_updated_at is null
+            or c.updated_at > c.summary_updated_at) as desatualizado,
            (select count(*)::int from message m where m.conversation_id = c.id) as message_count
       from conversation c
      order by c.updated_at desc
@@ -142,7 +144,8 @@ export async function listConversations(limit: number): Promise<AdminRow[]> {
     contactPhone: r.contact_phone,
     dorPrincipal: r.dor_principal,
     messageCount: r.message_count,
-    summaryInputHash: r.summary_input_hash,
+    temResumo: r.tem_resumo,
+    desatualizado: r.desatualizado,
   }))
 }
 
