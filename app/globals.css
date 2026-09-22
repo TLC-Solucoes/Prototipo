@@ -1,6 +1,64 @@
 @import "tailwindcss";
 
-html,
-body {
-  height: 100%;
+@theme {
+  --font-sans: var(--font-sans), 'Plus Jakarta Sans', sans-serif;
+
+  --color-surface: #fff8f1;
+  --color-surface-dim: #e0d9d1;
+  --color-surface-bright: #fff8f1;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #faf2ea;
+  --color-surface-container: #f4ede5;
+  --color-surface-container-high: #eee7df;
+  --color-surface-container-highest: #e8e1d9;
+  --color-on-surface: #1e1b17;
+  --color-on-surface-variant: #3f4946;
+  --color-outline: #6f7976;
+  --color-outline-variant: #bec9c5;
+
+  --color-primary: #00453d;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #075e54;
+  --color-on-primary-container: #8dd5c8;
+  --color-primary-fixed: #a8f0e3;
+  --color-primary-fixed-dim: #8cd4c7;
+
+  --color-secondary: #006b5f;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #8cf1e1;
+  --color-on-secondary-container: #006f64;
+
+  --color-tertiary: #00471c;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-fixed: #66ff8e;
+  --color-tertiary-fixed-dim: #3de273;
+  --color-on-tertiary-fixed: #002109;
+
+  --color-background: #fff8f1;
+  --color-on-background: #1e1b17;
+}
+
+@layer base {
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  }
+  body {
+    overscroll-behavior: none;
+  }
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+.wa-chat-bg {
+  background-color: #ece5dd;
+  background-image: radial-gradient(#bec9c5 0.75px, transparent 0.75px),
+    radial-gradient(#bec9c5 0.75px, #ece5dd 0.75px);
+  background-size: 24px 24px;
+  background-position: 0 0, 12px 12px;
+  opacity: 0.98;
 }
