@@ -20,6 +20,10 @@ vi.mock('@/lib/db', () => ({
     mensagensDoUsuario.push(content)
     return true
   },
+  countConversationsLastHour: async () => {
+    await latencia()
+    return conversas.length
+  },
   countRecentConversations: async () => {
     await latencia()
     return conversas.length

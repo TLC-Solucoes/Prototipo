@@ -1,9 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ABERTURA } from '@/lib/abertura'
-import { LIMITS } from '@/lib/rate-limit'
+import { LIMITS, maxConversasHora } from '@/lib/rate-limit'
 
 const appendMessage = vi.fn()
 const appendUserMessageWithinLimit = vi.fn()
+const countConversationsLastHour = vi.fn()
 const streamChat = vi.fn()
 const listMessages = vi.fn()
 
@@ -11,6 +12,7 @@ vi.mock('@/lib/db', () => ({
   appendMessage: (...args: unknown[]) => appendMessage(...args),
   appendUserMessageWithinLimit: (...args: unknown[]) =>
     appendUserMessageWithinLimit(...args),
+  countConversationsLastHour: (...args: unknown[]) => countConversationsLastHour(...args),
   countRecentConversations: async () => 0,
   countUserMessages: async () => 0,
   createConversationWithinLimit: async () => 'conversa-1',
@@ -32,9 +34,12 @@ function requisicao(text: string) {
 
 beforeEach(() => {
   process.env.IP_HASH_SALT = 'salt-de-teste'
+  delete process.env.CHAT_PAUSADO
   appendMessage.mockReset()
   appendUserMessageWithinLimit.mockReset()
   appendUserMessageWithinLimit.mockResolvedValue(true)
+  countConversationsLastHour.mockReset()
+  countConversationsLastHour.mockResolvedValue(0)
   streamChat.mockReset()
   streamChat.mockImplementation(async function* () {
     throw new Error('vps fora do ar')
@@ -52,6 +57,27 @@ beforeEach(() => {
 })
 
 describe('POST /api/chat quando o modelo falha', () => {
+  it('não toca no banco nem no modelo com o chat pausado', async () => {
+    process.env.CHAT_PAUSADO = '1'
+    const { POST } = await import('@/app/api/chat/route')
+    const resposta = await POST(requisicao('tenho uma loja'))
+
+    expect(await resposta.text()).toContain('fora do ar')
+    expect(appendMessage).not.toHaveBeenCalled()
+    expect(appendUserMessageWithinLimit).not.toHaveBeenCalled()
+    expect(streamChat).not.toHaveBeenCalled()
+  })
+
+  it('recusa conversa nova quando o teto global da hora estourou', async () => {
+    countConversationsLastHour.mockResolvedValue(maxConversasHora())
+    const { POST } = await import('@/app/api/chat/route')
+    const resposta = await POST(requisicao('tenho uma loja'))
+
+    expect(await resposta.text()).toContain('muita gente')
+    expect(appendUserMessageWithinLimit).not.toHaveBeenCalled()
+    expect(streamChat).not.toHaveBeenCalled()
+  })
+
   it('grava a mensagem do visitante mesmo assim', async () => {
     const { POST } = await import('@/app/api/chat/route')
     const resposta = await POST(requisicao('tenho uma loja'))

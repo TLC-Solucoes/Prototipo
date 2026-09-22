@@ -95,6 +95,14 @@ export async function countRecentConversations(
   return rows[0].n as number
 }
 
+export async function countConversationsLastHour(): Promise<number> {
+  const rows = await sql`
+    select count(*)::int as n from conversation
+     where created_at > now() - interval '1 hour'
+  `
+  return rows[0].n as number
+}
+
 export async function countUserMessages(conversationId: string): Promise<number> {
   const rows = await sql`
     select count(*)::int as n from message

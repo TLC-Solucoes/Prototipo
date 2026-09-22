@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 import {
   checkMessage,
   checkNewConversation,
+  CONVERSAS_POR_HORA_PADRAO,
   LIMITS,
+  maxConversasHora,
   type RateLimitDeps,
 } from '@/lib/rate-limit'
 
@@ -63,5 +65,30 @@ describe('checkMessage', () => {
   it('rejeita mensagem vazia', async () => {
     const v = await checkMessage(deps(0, 0), 'c', '   ')
     expect(v.ok === false && v.reason).toBe('tamanho')
+  })
+})
+
+describe('maxConversasHora', () => {
+  it('cai no padrão sem a variável', () => {
+    delete process.env.MAX_CONVERSAS_HORA
+    expect(maxConversasHora()).toBe(CONVERSAS_POR_HORA_PADRAO)
+  })
+
+  it('obedece a variável', () => {
+    process.env.MAX_CONVERSAS_HORA = '12'
+    try {
+      expect(maxConversasHora()).toBe(12)
+    } finally {
+      delete process.env.MAX_CONVERSAS_HORA
+    }
+  })
+
+  it('ignora lixo na variável', () => {
+    process.env.MAX_CONVERSAS_HORA = 'muitas'
+    try {
+      expect(maxConversasHora()).toBe(CONVERSAS_POR_HORA_PADRAO)
+    } finally {
+      delete process.env.MAX_CONVERSAS_HORA
+    }
   })
 })

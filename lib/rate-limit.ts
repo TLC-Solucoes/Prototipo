@@ -10,6 +10,19 @@ export const RECUSA_IP =
 export const RECUSA_MENSAGENS =
   'A gente já conversou bastante e eu tenho material de sobra pro time trabalhar. Me deixa seu nome e um contato que alguém te procura.'
 
+export const CONVERSAS_POR_HORA_PADRAO = 60
+
+export const PAUSADO =
+  'O assistente está fora do ar por alguns instantes. Volta daqui a pouco que a gente mapeia o que dá pra automatizar no seu negócio.'
+
+export const RECUSA_GLOBAL =
+  'Estou atendendo muita gente agora e não consigo te ouvir direito. Tenta de novo mais tarde, ou fala com a TLC pelo contato direto.'
+
+export function maxConversasHora(): number {
+  const bruto = Number(process.env.MAX_CONVERSAS_HORA)
+  return Number.isFinite(bruto) && bruto > 0 ? bruto : CONVERSAS_POR_HORA_PADRAO
+}
+
 export type RateLimitDeps = {
   countRecentConversations: (ipHash: string, minutes: number) => Promise<number>
   countUserMessages: (conversationId: string) => Promise<number>

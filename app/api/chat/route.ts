@@ -3,6 +3,7 @@ import { ABERTURA } from '@/lib/abertura'
 import {
   appendMessage,
   appendUserMessageWithinLimit,
+  countConversationsLastHour,
   countRecentConversations,
   countUserMessages,
   createConversationWithinLimit,
@@ -16,6 +17,9 @@ import {
   checkMessage,
   checkNewConversation,
   LIMITS,
+  maxConversasHora,
+  PAUSADO,
+  RECUSA_GLOBAL,
   RECUSA_IP,
   RECUSA_MENSAGENS,
 } from '@/lib/rate-limit'
@@ -45,6 +49,8 @@ function texto(corpo: string, cookie: string | null): Response {
 }
 
 export async function POST(req: NextRequest): Promise<Response> {
+  if (process.env.CHAT_PAUSADO) return texto(PAUSADO, null)
+
   const corpo = (await req.json().catch(() => null)) as { text?: string } | null
   if (!corpo || typeof corpo.text !== 'string') {
     return texto('Não entendi sua mensagem.', null)
@@ -65,6 +71,10 @@ export async function POST(req: NextRequest): Promise<Response> {
     if (!conversationId) {
       const veredito = await checkNewConversation(deps, ipHash)
       if (!veredito.ok) return texto(veredito.message, null)
+
+      if ((await countConversationsLastHour()) >= maxConversasHora()) {
+        return texto(RECUSA_GLOBAL, null)
+      }
 
       conversationId = await createConversationWithinLimit(
         ipHash,

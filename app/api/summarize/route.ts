@@ -1,10 +1,17 @@
 import type { NextRequest } from 'next/server'
-import { summarizeConversation } from '@/lib/summarize'
+import { PAUSADO } from '@/lib/rate-limit'
 import { readConversationId } from '@/lib/session'
+import { summarizeConversation } from '@/lib/summarize'
 
 export const runtime = 'nodejs'
 
 export async function POST(req: NextRequest): Promise<Response> {
+  if (process.env.CHAT_PAUSADO) {
+    return new Response(PAUSADO, {
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+    })
+  }
+
   const conversationId = readConversationId(req)
   if (!conversationId) return new Response(null, { status: 204 })
 
