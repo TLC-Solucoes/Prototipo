@@ -57,12 +57,12 @@ export async function POST(req: NextRequest): Promise<Response> {
   }
 
   const mensagem = corpo.text.trim()
-  const ipHash = hashIp(clientIp(req))
   let conversationId: string | null = null
   let cookie: string | null = null
   let historico: Awaited<ReturnType<typeof listMessages>>
 
   try {
+    const ipHash = hashIp(clientIp(req))
     conversationId = readConversationId(req)
     if (conversationId && !(await getConversation(conversationId))) {
       conversationId = null
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest): Promise<Response> {
 
     historico = await listMessages(conversationId)
   } catch (erro) {
-    console.error('chat: falha no banco antes do stream', erro)
+    console.error('chat: falha antes do stream', erro)
     return texto(FALHA_NO_BANCO, cookie)
   }
 

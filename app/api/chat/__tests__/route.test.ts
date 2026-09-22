@@ -78,6 +78,15 @@ describe('POST /api/chat quando o modelo falha', () => {
     expect(streamChat).not.toHaveBeenCalled()
   })
 
+  it('não vaza erro cru quando falta o salt do hash de IP', async () => {
+    delete process.env.IP_HASH_SALT
+    const { POST } = await import('@/app/api/chat/route')
+    const resposta = await POST(requisicao('tenho uma loja'))
+
+    expect(await resposta.text()).toContain('não consegui registrar')
+    expect(streamChat).not.toHaveBeenCalled()
+  })
+
   it('grava a mensagem do visitante mesmo assim', async () => {
     const { POST } = await import('@/app/api/chat/route')
     const resposta = await POST(requisicao('tenho uma loja'))
