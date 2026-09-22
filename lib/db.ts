@@ -1,3 +1,4 @@
+import 'server-only'
 import { neon } from '@neondatabase/serverless'
 import type { AdminRow, Conversation, Message, Role, Summary } from '@/lib/types'
 
