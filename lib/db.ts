@@ -53,7 +53,8 @@ export async function appendUserMessageWithinLimit(
   ])
 
   if (inseridas.length === 0) return false
-  await sql`update conversation set updated_at = now() where id = ${conversationId}`
+  await sql`update conversation set updated_at = now(), transcript_hash = null
+             where id = ${conversationId}`
   return true
 }
 
@@ -105,7 +106,8 @@ export async function appendMessage(
     insert into message (conversation_id, role, content, incomplete)
     values (${conversationId}, ${role}, ${content}, ${incomplete})
   `
-  await sql`update conversation set updated_at = now() where id = ${conversationId}`
+  await sql`update conversation set updated_at = now(), transcript_hash = null
+             where id = ${conversationId}`
 }
 
 export async function countRecentConversations(
@@ -141,6 +143,7 @@ export async function saveSummary(
        set summary = ${JSON.stringify(summary)}::jsonb,
            summary_updated_at = ${transcriptReadAt.toISOString()}::timestamptz,
            summary_input_hash = ${inputHash},
+           transcript_hash = ${inputHash},
            contact_name = coalesce(${nome}, contact_name),
            contact_email = coalesce(${email}, contact_email),
            contact_phone = coalesce(${telefone}, contact_phone),
@@ -155,7 +158,8 @@ export async function listConversations(limit: number): Promise<AdminRow[]> {
            c.contact_phone, c.summary ->> 'dorPrincipal' as dor_principal,
            c.summary is not null as tem_resumo,
            (c.summary_input_hash is null
-            or c.updated_at > c.summary_updated_at) as desatualizado,
+            or c.transcript_hash is null
+            or c.transcript_hash is distinct from c.summary_input_hash) as desatualizado,
            (select count(*)::int from message m where m.conversation_id = c.id) as message_count
       from conversation c
      order by c.updated_at desc

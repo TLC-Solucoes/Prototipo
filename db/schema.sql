@@ -10,7 +10,8 @@ create table if not exists conversation (
   summary              jsonb,
   summary_updated_at   timestamptz,
   summary_attempted_at timestamptz,
-  summary_input_hash   text
+  summary_input_hash   text,
+  transcript_hash      text
 );
 
 create table if not exists message (

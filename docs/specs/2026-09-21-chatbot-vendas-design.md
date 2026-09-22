@@ -70,7 +70,8 @@ create table if not exists conversation (
   summary              jsonb,
   summary_updated_at   timestamptz,
   summary_attempted_at timestamptz,
-  summary_input_hash   text
+  summary_input_hash   text,
+  transcript_hash      text
 );
 
 create table if not exists message (
@@ -94,9 +95,14 @@ ferramentas, urgência, adequação ao ICP).
 
 `summary_updated_at` só é escrito quando um resumo é salvo, e carrega o instante em que
 o transcript foi lido, não o da gravação: significa "o resumo guardado reflete a conversa
-até aqui", que é o que o painel pergunta ao comparar com `updated_at`.
-`summary_attempted_at` é coluna separada, do cooldown — a tentativa marca ali antes de
-chamar o modelo, então extração que falha continua aparecendo como desatualizada.
+até aqui". `summary_attempted_at` é coluna separada, do cooldown — a tentativa marca ali
+antes de chamar o modelo, então extração que falha continua aparecendo como desatualizada.
+
+`transcript_hash` é o SHA-256 do transcript, mantido pelo banco: cada mensagem nova o
+zera junto com o `updated_at`, e salvar um resumo o grava igual a `summary_input_hash`.
+Comparar as duas colunas responde "o resumo guardado ainda vale?" sem reler o transcript
+nem comparar relógios — é a mesma pergunta que a guarda do servidor faz antes de chamar
+o modelo, então o painel só oferece o botão de regerar quando ele vai de fato gerar algo.
 
 Guarda-se `ip_hash` (SHA-256 do IP com salt), nunca o IP. Serve ao rate limit e não
 cria um cadastro de endereço de ninguém.
@@ -174,7 +180,7 @@ que falha a extração deixa o registro anterior intacto em vez de apagá-lo.
 as conversas mais recentes com data, status, contato e a dor principal do resumo;
 abrir uma mostra o transcript completo e o JSON.
 
-Conversa cujo `summary_input_hash` não bate com o transcript atual aparece marcada
+Conversa cujo `transcript_hash` não bate com `summary_input_hash` aparece marcada
 como desatualizada e traz um botão que chama `/api/summarize` para aquela conversa,
 ignorando o cooldown — o pedido partiu de vocês, não de um cliente anônimo.
 
