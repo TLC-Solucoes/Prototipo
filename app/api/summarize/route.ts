@@ -10,7 +10,8 @@ export async function POST(req: NextRequest): Promise<Response> {
 
   try {
     await summarizeConversation(conversationId, false)
-  } catch {
+  } catch (erro) {
+    console.error('summarize: falha ao resumir a conversa', erro)
     return new Response(null, { status: 204 })
   }
 

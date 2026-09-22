@@ -84,7 +84,8 @@ export async function POST(req: NextRequest): Promise<Response> {
     if (!gravou) return texto(RECUSA_MENSAGENS, cookie)
 
     historico = await listMessages(conversationId)
-  } catch {
+  } catch (erro) {
+    console.error('chat: falha no banco antes do stream', erro)
     return texto(FALHA_DO_MODELO, cookie)
   }
 
@@ -99,14 +100,16 @@ export async function POST(req: NextRequest): Promise<Response> {
           completo += pedaco
           controller.enqueue(encoder.encode(pedaco))
         }
-      } catch {
+      } catch (erro) {
         incompleta = true
+        console.error('chat: stream do modelo falhou', erro)
         if (completo === '') controller.enqueue(encoder.encode(FALHA_DO_MODELO))
       } finally {
         try {
           if (completo !== '') await appendMessage(id, 'assistant', completo, incompleta)
-        } catch {
+        } catch (erro) {
           incompleta = true
+          console.error('chat: falha ao gravar a resposta do assistente', erro)
         }
         controller.close()
       }

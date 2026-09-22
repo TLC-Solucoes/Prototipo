@@ -39,7 +39,10 @@ export async function summarizeConversation(
   ])
 
   const resumo = parseSummary(bruto)
-  if (!resumo) return false
+  if (!resumo) {
+    console.error('summarize: o modelo não devolveu JSON utilizável')
+    return false
+  }
 
   await saveSummary(conversationId, resumo, transcriptHash)
   return true
