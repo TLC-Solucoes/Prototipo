@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { ABERTURA } from '@/lib/abertura'
 
 const FALHA =
-  'Não consegui responder agora. Sua mensagem foi guardada — tenta de novo em instantes.'
+  'Não consegui responder agora. Tenta mandar de novo daqui a pouco.'
 
 const INATIVIDADE_MS = 45_000
 
