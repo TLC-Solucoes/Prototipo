@@ -20,10 +20,8 @@ de novo sempre que o schema mudar.
 
 | Variável | Para quê |
 |---|---|
-| `OPENAI_BASE_URL` | endpoint OpenAI-compatible no VPS |
-| `OPENAI_API_KEY` | credencial do endpoint |
-| `MODEL_NAME` | modelo da conversa |
-| `MODEL_NAME_EXTRACT` | modelo da extração; cai para `MODEL_NAME` se ausente |
+| `AGENT_CHAT_URL` | URL de stream do agente, incluindo o uuid do agente |
+| `AGENT_API_KEY` | credencial do agente, enviada no header `x-api-key` |
 | `DATABASE_URL` | Neon |
 | `ADMIN_PASSWORD` | Basic Auth do painel; gere com `openssl rand -hex 24` |
 | `IP_HASH_SALT` | salt do hash de IP; sem ela a aplicação recusa atender |

@@ -22,7 +22,7 @@ Next.js (App Router) + TypeScript + Tailwind, deploy na Vercel.
 ```
 visitante → / (chat)
               │
-              ├─ POST /api/chat ──────stream─────→ VPS (API OpenAI-compatible)
+              ├─ POST /api/chat ──────stream─────→ agente do time (SSE)
               │        ↓                                      ↑
               │   Neon Postgres                               │
               │        ↑                                      │
@@ -35,15 +35,14 @@ Uma rota visível para o público (`/`) e uma interna (`/admin`). Nada mais.
 
 ### Runtime
 
-Node, não Edge. O driver serverless do Neon roda nos dois, mas o SDK `openai` é mais
-previsível em Node, e o ganho de latência do Edge é irrelevante diante do tempo que o
-modelo leva para responder.
+Node, não Edge. O driver serverless do Neon roda nos dois, e o ganho de latência do
+Edge é irrelevante diante do tempo que o modelo leva para responder.
 
 ### Camadas
 
 | Módulo | Responsabilidade | Depende de |
 |---|---|---|
-| `lib/llm.ts` | falar com o VPS: streaming e chamada simples | SDK `openai`, env |
+| `lib/llm.ts` | falar com o agente: streaming e chamada simples | `fetch`, env |
 | `lib/prompt.ts` | montar o system prompt a partir da persona e do roteiro | — |
 | `lib/summary.ts` | tipos do resumo e parse tolerante do JSON | — |
 | `lib/summarize.ts` | transformar transcript em resumo e gravá-lo | `lib/llm.ts`, `lib/db.ts` |
@@ -207,16 +206,17 @@ nenhum diagnóstico honesto precisa de 40 mensagens.
 
 | Variável | Para quê |
 |---|---|
-| `OPENAI_BASE_URL` | endpoint OpenAI-compatible no VPS |
-| `OPENAI_API_KEY` | credencial do endpoint |
-| `MODEL_NAME` | modelo da conversa |
-| `MODEL_NAME_EXTRACT` | modelo da extração; cai para `MODEL_NAME` se ausente |
+| `AGENT_CHAT_URL` | URL de stream do agente, incluindo o uuid do agente |
+| `AGENT_API_KEY` | credencial do agente, enviada no header `x-api-key` |
 | `DATABASE_URL` | Neon |
 | `ADMIN_PASSWORD` | Basic Auth do painel |
 | `IP_HASH_SALT` | salt do hash de IP |
 
-Usar o SDK `openai` com `baseURL` mantém o código indiferente a onde o modelo roda:
-trocar o VPS por outro servidor, ou por um provider externo, é mudar duas variáveis.
+O endpoint não é OpenAI-compatible: é um wrapper próprio do time que recebe
+`{ message, history }` e devolve SSE cujo payload é OpenAI-shaped
+(`choices[0].delta.content`). O modelo é fixo do lado do servidor, escolhido pelo
+uuid do agente na URL — não há variável de modelo aqui. O servidor não guarda estado
+da conversa: todo o contexto vai em `history` a cada chamada.
 
 ## Testes
 
