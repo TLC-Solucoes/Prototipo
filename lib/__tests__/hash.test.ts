@@ -19,6 +19,28 @@ describe('hashIp', () => {
     const { hashIp } = await import('@/lib/hash')
     expect(hashIp('200.1.2.3')).not.toContain('200.1.2.3')
   })
+
+  it('recusa hashear sem salt em vez de virar sha256 puro do ip', async () => {
+    const { hashIp } = await import('@/lib/hash')
+    const salt = process.env.IP_HASH_SALT
+    delete process.env.IP_HASH_SALT
+    try {
+      expect(() => hashIp('200.1.2.3')).toThrow('IP_HASH_SALT')
+    } finally {
+      process.env.IP_HASH_SALT = salt
+    }
+  })
+
+  it('recusa salt vazio', async () => {
+    const { hashIp } = await import('@/lib/hash')
+    const salt = process.env.IP_HASH_SALT
+    process.env.IP_HASH_SALT = ''
+    try {
+      expect(() => hashIp('200.1.2.3')).toThrow('IP_HASH_SALT')
+    } finally {
+      process.env.IP_HASH_SALT = salt
+    }
+  })
 })
 
 describe('hashTranscript', () => {

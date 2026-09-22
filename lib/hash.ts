@@ -1,8 +1,14 @@
 import { createHash } from 'node:crypto'
 import type { Message } from '@/lib/types'
 
+function obrigatoria(nome: string): string {
+  const valor = process.env[nome]
+  if (!valor) throw new Error(`Variável de ambiente ${nome} não definida`)
+  return valor
+}
+
 export function hashIp(ip: string): string {
-  const salt = process.env.IP_HASH_SALT ?? ''
+  const salt = obrigatoria('IP_HASH_SALT')
   return createHash('sha256').update(`${salt}:${ip}`).digest('hex')
 }
 
