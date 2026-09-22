@@ -7,6 +7,7 @@ const appendUserMessageWithinLimit = vi.fn()
 const createConversationWithinLimit = vi.fn()
 const streamChat = vi.fn()
 const listMessages = vi.fn()
+const getConversation = vi.fn()
 
 vi.mock('@/lib/db', () => ({
   appendMessage: (...args: unknown[]) => appendMessage(...args),
@@ -16,7 +17,7 @@ vi.mock('@/lib/db', () => ({
   countUserMessages: async () => 0,
   createConversationWithinLimit: (...args: unknown[]) =>
     createConversationWithinLimit(...args),
-  getConversation: async () => null,
+  getConversation: (...args: unknown[]) => getConversation(...args),
   listMessages: (...args: unknown[]) => listMessages(...args),
 }))
 
@@ -24,11 +25,11 @@ vi.mock('@/lib/llm', () => ({
   streamChat: (...args: unknown[]) => streamChat(...args),
 }))
 
-function requisicao(text: string) {
+function requisicao(text: string, cookie?: string) {
   return {
     json: async () => ({ text }),
     headers: new Headers({ 'x-forwarded-for': '200.1.2.3' }),
-    cookies: { get: () => undefined },
+    cookies: { get: () => (cookie === undefined ? undefined : { value: cookie }) },
   } as never
 }
 
@@ -44,6 +45,8 @@ beforeEach(() => {
   streamChat.mockImplementation(async function* () {
     throw new Error('vps fora do ar')
   })
+  getConversation.mockReset()
+  getConversation.mockResolvedValue(null)
   listMessages.mockReset()
   listMessages.mockResolvedValue([
     {
@@ -201,6 +204,15 @@ describe('POST /api/chat quando o modelo falha', () => {
     expect(await resposta.text()).toContain('caracteres')
     expect(createConversationWithinLimit).not.toHaveBeenCalled()
     expect(appendMessage).not.toHaveBeenCalled()
+  })
+
+  it('abre conversa nova quando o cookie não é um uuid', async () => {
+    const { POST } = await import('@/app/api/chat/route')
+    const resposta = await POST(requisicao('tenho uma loja', 'lixo-que-não-é-uuid'))
+    await resposta.text()
+
+    expect(getConversation).not.toHaveBeenCalled()
+    expect(createConversationWithinLimit).toHaveBeenCalled()
   })
 
   it('o modelo recebe a abertura como contexto já na primeira mensagem do visitante', async () => {

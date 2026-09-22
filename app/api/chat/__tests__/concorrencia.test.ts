@@ -47,6 +47,8 @@ vi.mock('@/lib/llm', () => ({
   },
 }))
 
+const CONVERSA_EXISTENTE = '3f2504e0-4f89-41d3-9a0c-0305e82c3301'
+
 function requisicao(cookie: string | null) {
   return {
     json: async () => ({ text: 'tenho uma loja' }),
@@ -85,7 +87,7 @@ describe('POST /api/chat em paralelo, com a guarda do banco fingida atômica', (
   it('a rota deixa a guarda decidir e não grava mensagem além do teto', async () => {
     const { POST } = await import('@/app/api/chat/route')
     const disparos = Array.from({ length: LIMITS.userMessagesPerConversation + 15 }, () =>
-      POST(requisicao('conversa-1')),
+      POST(requisicao(CONVERSA_EXISTENTE)),
     )
     const respostas = await Promise.all(disparos)
     await Promise.all(respostas.map((r) => r.text()))
