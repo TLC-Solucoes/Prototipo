@@ -24,3 +24,4 @@ create table if not exists message (
 
 create index if not exists message_conversation_idx on message (conversation_id, id);
 create index if not exists conversation_ip_recent_idx on conversation (ip_hash, created_at desc);
+create index if not exists conversation_created_idx on conversation (created_at desc);
