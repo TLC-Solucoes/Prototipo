@@ -38,7 +38,7 @@ export async function appendUserMessageWithinLimit(
 export async function getConversation(id: string): Promise<Conversation | null> {
   const rows = await sql`
     select id, created_at, status, contact_name, contact_email, contact_phone,
-           summary, summary_updated_at, summary_input_hash
+           summary, summary_updated_at, summary_attempted_at, summary_input_hash
       from conversation where id = ${id}
   `
   if (rows.length === 0) return null
@@ -52,6 +52,9 @@ export async function getConversation(id: string): Promise<Conversation | null> 
     contactPhone: r.contact_phone,
     summary: r.summary as Summary | null,
     summaryUpdatedAt: r.summary_updated_at ? new Date(r.summary_updated_at) : null,
+    summaryAttemptedAt: r.summary_attempted_at
+      ? new Date(r.summary_attempted_at)
+      : null,
     summaryInputHash: r.summary_input_hash,
   }
 }
@@ -136,7 +139,7 @@ export async function listConversations(limit: number): Promise<AdminRow[]> {
     select c.id, c.created_at, c.status, c.contact_name, c.contact_email,
            c.contact_phone, c.summary ->> 'dorPrincipal' as dor_principal,
            c.summary is not null as tem_resumo,
-           (c.summary_updated_at is null
+           (c.summary_input_hash is null
             or c.updated_at > c.summary_updated_at) as desatualizado,
            (select count(*)::int from message m where m.conversation_id = c.id) as message_count
       from conversation c
@@ -162,10 +165,10 @@ export async function claimSummarySlot(
   cooldownSeconds: number,
 ): Promise<boolean> {
   const rows = await sql`
-    update conversation set summary_updated_at = now()
+    update conversation set summary_attempted_at = now()
      where id = ${conversationId}
-       and (summary_updated_at is null
-            or summary_updated_at < now() - make_interval(secs => ${cooldownSeconds}))
+       and (summary_attempted_at is null
+            or summary_attempted_at < now() - make_interval(secs => ${cooldownSeconds}))
     returning id
   `
   return rows.length > 0

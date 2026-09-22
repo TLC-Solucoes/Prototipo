@@ -16,7 +16,7 @@ export async function summarizeConversation(
 
   const transcriptHash = hashTranscript(mensagens)
   const permitido = shouldSummarize({
-    summaryUpdatedAt: conversa.summaryUpdatedAt,
+    summaryAttemptedAt: conversa.summaryAttemptedAt,
     summaryInputHash: conversa.summaryInputHash,
     transcriptHash,
     now: new Date(),

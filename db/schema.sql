@@ -1,15 +1,16 @@
 create table if not exists conversation (
-  id                 uuid primary key default gen_random_uuid(),
-  created_at         timestamptz not null default now(),
-  updated_at         timestamptz not null default now(),
-  ip_hash            text not null,
-  status             text not null default 'aberta',
-  contact_name       text,
-  contact_email      text,
-  contact_phone      text,
-  summary            jsonb,
-  summary_updated_at timestamptz,
-  summary_input_hash text
+  id                   uuid primary key default gen_random_uuid(),
+  created_at           timestamptz not null default now(),
+  updated_at           timestamptz not null default now(),
+  ip_hash              text not null,
+  status               text not null default 'aberta',
+  contact_name         text,
+  contact_email        text,
+  contact_phone        text,
+  summary              jsonb,
+  summary_updated_at   timestamptz,
+  summary_attempted_at timestamptz,
+  summary_input_hash   text
 );
 
 create table if not exists message (

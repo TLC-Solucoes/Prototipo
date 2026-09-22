@@ -28,6 +28,7 @@ export type Conversation = {
   contactPhone: string | null
   summary: Summary | null
   summaryUpdatedAt: Date | null
+  summaryAttemptedAt: Date | null
   summaryInputHash: string | null
 }
 

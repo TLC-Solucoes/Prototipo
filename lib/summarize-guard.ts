@@ -1,7 +1,7 @@
 export const COOLDOWN_MS = 60_000
 
 export function shouldSummarize(args: {
-  summaryUpdatedAt: Date | null
+  summaryAttemptedAt: Date | null
   summaryInputHash: string | null
   transcriptHash: string
   now: Date
@@ -9,6 +9,6 @@ export function shouldSummarize(args: {
 }): boolean {
   if (args.summaryInputHash === args.transcriptHash) return false
   if (args.force) return true
-  if (args.summaryUpdatedAt === null) return true
-  return args.now.getTime() - args.summaryUpdatedAt.getTime() >= COOLDOWN_MS
+  if (args.summaryAttemptedAt === null) return true
+  return args.now.getTime() - args.summaryAttemptedAt.getTime() >= COOLDOWN_MS
 }

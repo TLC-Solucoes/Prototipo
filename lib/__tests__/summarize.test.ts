@@ -27,7 +27,7 @@ beforeEach(() => {
   getConversation.mockReset()
   getConversation.mockResolvedValue({
     id: 'c1',
-    summaryUpdatedAt: null,
+    summaryAttemptedAt: null,
     summaryInputHash: null,
   })
   listMessages.mockReset()
@@ -85,7 +85,7 @@ describe('summarizeConversation', () => {
     const mensagens = await listMessages()
     getConversation.mockResolvedValue({
       id: 'c1',
-      summaryUpdatedAt: new Date(),
+      summaryAttemptedAt: new Date(),
       summaryInputHash: hashTranscript(mensagens),
     })
     const { summarizeConversation } = await import('@/lib/summarize')

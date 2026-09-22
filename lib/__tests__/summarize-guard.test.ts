@@ -9,7 +9,7 @@ describe('shouldSummarize', () => {
   it('resume conversa que nunca foi resumida', () => {
     expect(
       shouldSummarize({
-        summaryUpdatedAt: null,
+        summaryAttemptedAt: null,
         summaryInputHash: null,
         transcriptHash: 'abc',
         now: agora,
@@ -20,7 +20,7 @@ describe('shouldSummarize', () => {
   it('recusa dentro do cooldown', () => {
     expect(
       shouldSummarize({
-        summaryUpdatedAt: haPouco,
+        summaryAttemptedAt: haPouco,
         summaryInputHash: 'antigo',
         transcriptHash: 'novo',
         now: agora,
@@ -31,7 +31,7 @@ describe('shouldSummarize', () => {
   it('recusa quando o transcript não mudou', () => {
     expect(
       shouldSummarize({
-        summaryUpdatedAt: haMuito,
+        summaryAttemptedAt: haMuito,
         summaryInputHash: 'igual',
         transcriptHash: 'igual',
         now: agora,
@@ -42,7 +42,7 @@ describe('shouldSummarize', () => {
   it('resume fora do cooldown com transcript novo', () => {
     expect(
       shouldSummarize({
-        summaryUpdatedAt: haMuito,
+        summaryAttemptedAt: haMuito,
         summaryInputHash: 'antigo',
         transcriptHash: 'novo',
         now: agora,
@@ -53,7 +53,7 @@ describe('shouldSummarize', () => {
   it('force ignora o cooldown', () => {
     expect(
       shouldSummarize({
-        summaryUpdatedAt: haPouco,
+        summaryAttemptedAt: haPouco,
         summaryInputHash: 'antigo',
         transcriptHash: 'novo',
         now: agora,
@@ -65,7 +65,7 @@ describe('shouldSummarize', () => {
   it('force não regera resumo idêntico', () => {
     expect(
       shouldSummarize({
-        summaryUpdatedAt: haPouco,
+        summaryAttemptedAt: haPouco,
         summaryInputHash: 'igual',
         transcriptHash: 'igual',
         now: agora,
