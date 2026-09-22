@@ -18,6 +18,13 @@ export const PAUSADO =
 export const RECUSA_GLOBAL =
   'Estou atendendo muita gente agora e não consigo te ouvir direito. Tenta de novo mais tarde, ou fala com a TLC pelo contato direto.'
 
+const NEGATIVOS = ['', '0', 'false', 'off']
+
+export function chatPausado(): boolean {
+  const bruto = (process.env.CHAT_PAUSADO ?? '').trim().toLowerCase()
+  return !NEGATIVOS.includes(bruto)
+}
+
 export function maxConversasHora(): number {
   const bruto = Number(process.env.MAX_CONVERSAS_HORA)
   return Number.isFinite(bruto) && bruto > 0 ? bruto : CONVERSAS_POR_HORA_PADRAO

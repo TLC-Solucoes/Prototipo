@@ -1,12 +1,12 @@
 import type { NextRequest } from 'next/server'
-import { PAUSADO } from '@/lib/rate-limit'
+import { chatPausado, PAUSADO } from '@/lib/rate-limit'
 import { readConversationId } from '@/lib/session'
 import { summarizeConversation } from '@/lib/summarize'
 
 export const runtime = 'nodejs'
 
 export async function POST(req: NextRequest): Promise<Response> {
-  if (process.env.CHAT_PAUSADO) {
+  if (chatPausado()) {
     return new Response(PAUSADO, {
       headers: { 'Content-Type': 'text/plain; charset=utf-8' },
     })

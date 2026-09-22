@@ -14,6 +14,7 @@ import { hashIp } from '@/lib/hash'
 import { streamChat } from '@/lib/llm'
 import { buildChatMessages } from '@/lib/prompt'
 import {
+  chatPausado,
   checkMessage,
   checkNewConversation,
   LIMITS,
@@ -49,7 +50,7 @@ function texto(corpo: string, cookie: string | null): Response {
 }
 
 export async function POST(req: NextRequest): Promise<Response> {
-  if (process.env.CHAT_PAUSADO) return texto(PAUSADO, null)
+  if (chatPausado()) return texto(PAUSADO, null)
 
   const corpo = (await req.json().catch(() => null)) as { text?: string } | null
   if (!corpo || typeof corpo.text !== 'string') {

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  chatPausado,
   checkMessage,
   checkNewConversation,
   CONVERSAS_POR_HORA_PADRAO,
@@ -91,4 +92,31 @@ describe('maxConversasHora', () => {
       delete process.env.MAX_CONVERSAS_HORA
     }
   })
+})
+
+describe('chatPausado', () => {
+  const casos: [string | undefined, boolean][] = [
+    [undefined, false],
+    ['', false],
+    ['0', false],
+    ['false', false],
+    ['FALSE', false],
+    ['off', false],
+    [' off ', false],
+    ['1', true],
+    ['true', true],
+    ['sim', true],
+  ]
+
+  for (const [valor, esperado] of casos) {
+    it(`${valor === undefined ? 'sem a variável' : `com "${valor}"`} responde ${esperado}`, () => {
+      if (valor === undefined) delete process.env.CHAT_PAUSADO
+      else process.env.CHAT_PAUSADO = valor
+      try {
+        expect(chatPausado()).toBe(esperado)
+      } finally {
+        delete process.env.CHAT_PAUSADO
+      }
+    })
+  }
 })
