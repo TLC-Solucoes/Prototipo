@@ -6,6 +6,11 @@ import { hashTranscript } from '@/lib/hash'
 
 export const dynamic = 'force-dynamic'
 
+const formatadorHora = new Intl.DateTimeFormat('pt-BR', {
+  hour: '2-digit',
+  minute: '2-digit',
+})
+
 const campos: [string, (valor: string | null) => string][] = [
   ['Segmento', (v) => v ?? '—'],
   ['Porte', (v) => v ?? '—'],
@@ -63,27 +68,46 @@ export default async function Conversa({
 
       <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_452px]">
         <section className="flex flex-col gap-4">
-          <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#6F6A62]">
-            Transcrição
+          <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#A19A8E]">
+            Transcrição da Conversa
           </h2>
           {mensagens.map((mensagem) =>
             mensagem.role === 'assistant' ? (
-              <p
-                key={mensagem.id}
-                className="text-[15px] leading-relaxed text-[#C9C2B6]"
-              >
-                {mensagem.content}
-                {mensagem.incomplete ? (
-                  <span className="ml-2 text-[13px] text-[#D98A6E]">
-                    (resposta cortada)
-                  </span>
-                ) : null}
-              </p>
+              <div key={mensagem.id} className="flex justify-start">
+                <div className="max-w-[540px] w-full rounded-2xl rounded-tl-none bg-surface-container-lowest p-3.5 text-[#111B21] shadow-md border border-[#E9EDEF]">
+                  <div className="flex items-center justify-between gap-2 mb-1.5 border-b border-[#F0F2F5] pb-1">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#075E54]">
+                      Assistente
+                    </span>
+                    <span className="text-[11px] font-medium text-[#667781]">
+                      {formatadorHora.format(mensagem.createdAt)}
+                    </span>
+                  </div>
+                  <p className="text-[15px] leading-relaxed text-[#111B21] whitespace-pre-wrap">
+                    {mensagem.content}
+                    {mensagem.incomplete ? (
+                      <span className="ml-2 text-[13px] font-semibold text-[#BA1A1A]">
+                        (resposta cortada)
+                      </span>
+                    ) : null}
+                  </p>
+                </div>
+              </div>
             ) : (
               <div key={mensagem.id} className="flex justify-end">
-                <p className="max-w-[400px] rounded-[14px] rounded-br-[4px] border border-[#33302A] bg-[#26231F] px-4 py-2.5 text-[15px] leading-normal">
-                  {mensagem.content}
-                </p>
+                <div className="max-w-[540px] w-full rounded-2xl rounded-tr-none bg-[#DCF8C6] p-3.5 text-[#111B21] shadow-md border border-[#BCE1A2]">
+                  <div className="flex items-center justify-between gap-2 mb-1.5 border-b border-[#C6E8AC] pb-1">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#075E54]">
+                      Visitante
+                    </span>
+                    <span className="text-[11px] font-medium text-[#54656F]">
+                      {formatadorHora.format(mensagem.createdAt)}
+                    </span>
+                  </div>
+                  <p className="text-[15px] leading-relaxed text-[#111B21] whitespace-pre-wrap">
+                    {mensagem.content}
+                  </p>
+                </div>
               </div>
             ),
           )}
