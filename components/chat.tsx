@@ -73,9 +73,13 @@ export function Chat() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: limpo }),
       })
-      const leitor = resposta.body?.getReader()
+      if (!resposta.ok || !resposta.body) {
+        trocarUltima(FALHA)
+        return
+      }
+      const leitor = resposta.body.getReader()
       const decodificador = new TextDecoder()
-      while (leitor) {
+      for (;;) {
         const { done, value } = await leitor.read()
         if (done) break
         acumulado += decodificador.decode(value, { stream: true })
