@@ -1,19 +1,25 @@
 import OpenAI from 'openai'
 import type { ChatMessage } from '@/lib/prompt'
 
+function obrigatoria(nome: string): string {
+  const valor = process.env[nome]
+  if (!valor) throw new Error(`Variável de ambiente ${nome} não definida`)
+  return valor
+}
+
 function client(): OpenAI {
   return new OpenAI({
-    baseURL: process.env.OPENAI_BASE_URL,
-    apiKey: process.env.OPENAI_API_KEY,
+    baseURL: obrigatoria('OPENAI_BASE_URL'),
+    apiKey: process.env.OPENAI_API_KEY || 'sem-chave',
   })
 }
 
 function chatModel(): string {
-  return process.env.MODEL_NAME!
+  return obrigatoria('MODEL_NAME')
 }
 
 export function extractModel(): string {
-  return process.env.MODEL_NAME_EXTRACT || process.env.MODEL_NAME!
+  return process.env.MODEL_NAME_EXTRACT || chatModel()
 }
 
 export async function* streamChat(
