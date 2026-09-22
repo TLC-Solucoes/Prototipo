@@ -9,7 +9,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "db:migrate": "node --env-file=.env.local scripts/migrate.ts"
+    "db:migrate": "node --env-file=.env.local scripts/migrate.mts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
