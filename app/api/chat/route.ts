@@ -39,28 +39,35 @@ export async function POST(req: NextRequest): Promise<Response> {
     return texto('Não entendi sua mensagem.', null)
   }
 
+  const mensagem = corpo.text.trim()
   const ipHash = hashIp(clientIp(req))
-  let conversationId = readConversationId(req)
+  let conversationId: string | null = null
   let cookie: string | null = null
+  let historico: Awaited<ReturnType<typeof listMessages>>
 
-  if (conversationId && !(await getConversation(conversationId))) {
-    conversationId = null
+  try {
+    conversationId = readConversationId(req)
+    if (conversationId && !(await getConversation(conversationId))) {
+      conversationId = null
+    }
+
+    if (!conversationId) {
+      const veredito = await checkNewConversation(deps, ipHash)
+      if (!veredito.ok) return texto(veredito.message, null)
+      conversationId = await createConversation(ipHash)
+      cookie = conversationCookieHeader(conversationId)
+    }
+
+    const veredito = await checkMessage(deps, conversationId, mensagem)
+    if (!veredito.ok) return texto(veredito.message, cookie)
+
+    await appendMessage(conversationId, 'user', mensagem)
+    historico = await listMessages(conversationId)
+  } catch {
+    return texto(FALHA_DO_MODELO, cookie)
   }
-
-  if (!conversationId) {
-    const veredito = await checkNewConversation(deps, ipHash)
-    if (!veredito.ok) return texto(veredito.message, null)
-    conversationId = await createConversation(ipHash)
-    cookie = conversationCookieHeader(conversationId)
-  }
-
-  const veredito = await checkMessage(deps, conversationId, corpo.text)
-  if (!veredito.ok) return texto(veredito.message, cookie)
 
   const id = conversationId
-  await appendMessage(id, 'user', corpo.text.trim())
-  const historico = await listMessages(id)
-
   const encoder = new TextEncoder()
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
@@ -75,8 +82,10 @@ export async function POST(req: NextRequest): Promise<Response> {
         incompleta = true
         if (completo === '') controller.enqueue(encoder.encode(FALHA_DO_MODELO))
       } finally {
-        if (completo !== '') {
-          await appendMessage(id, 'assistant', completo, incompleta)
+        try {
+          if (completo !== '') await appendMessage(id, 'assistant', completo, incompleta)
+        } catch {
+          incompleta = true
         }
         controller.close()
       }
