@@ -4,6 +4,12 @@ export const LIMITS = {
   maxChars: 2000,
 }
 
+export const RECUSA_IP =
+  'Você já abriu várias conversas por aqui hoje. Se quiser falar com a gente agora, é melhor chamar direto no contato da TLC.'
+
+export const RECUSA_MENSAGENS =
+  'A gente já conversou bastante e eu tenho material de sobra pro time trabalhar. Me deixa seu nome e um contato que alguém te procura.'
+
 export type RateLimitDeps = {
   countRecentConversations: (ipHash: string, minutes: number) => Promise<number>
   countUserMessages: (conversationId: string) => Promise<number>
@@ -22,8 +28,7 @@ export async function checkNewConversation(
     return {
       ok: false,
       reason: 'ip',
-      message:
-        'Você já abriu várias conversas por aqui hoje. Se quiser falar com a gente agora, é melhor chamar direto no contato da TLC.',
+      message: RECUSA_IP,
     }
   }
   return { ok: true }
@@ -48,8 +53,7 @@ export async function checkMessage(
     return {
       ok: false,
       reason: 'mensagens',
-      message:
-        'A gente já conversou bastante e eu tenho material de sobra pro time trabalhar. Me deixa seu nome e um contato que alguém te procura.',
+      message: RECUSA_MENSAGENS,
     }
   }
 

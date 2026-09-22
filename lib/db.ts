@@ -4,11 +4,35 @@ import type { AdminRow, Conversation, Message, Role, Summary } from '@/lib/types
 
 const sql = neon(process.env.DATABASE_URL!)
 
-export async function createConversation(ipHash: string): Promise<string> {
+export async function createConversationWithinLimit(
+  ipHash: string,
+  perHour: number,
+): Promise<string | null> {
   const rows = await sql`
-    insert into conversation (ip_hash) values (${ipHash}) returning id
+    insert into conversation (ip_hash)
+    select ${ipHash}
+     where (select count(*) from conversation
+             where ip_hash = ${ipHash} and created_at > now() - interval '1 hour') < ${perHour}
+    returning id
   `
-  return rows[0].id as string
+  return rows.length > 0 ? (rows[0].id as string) : null
+}
+
+export async function appendUserMessageWithinLimit(
+  conversationId: string,
+  content: string,
+  maxMessages: number,
+): Promise<boolean> {
+  const rows = await sql`
+    insert into message (conversation_id, role, content)
+    select ${conversationId}, 'user', ${content}
+     where (select count(*) from message
+             where conversation_id = ${conversationId} and role = 'user') < ${maxMessages}
+    returning id
+  `
+  if (rows.length === 0) return false
+  await sql`update conversation set updated_at = now() where id = ${conversationId}`
+  return true
 }
 
 export async function getConversation(id: string): Promise<Conversation | null> {

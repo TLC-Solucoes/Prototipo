@@ -1,15 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ABERTURA } from '@/lib/abertura'
+import { LIMITS } from '@/lib/rate-limit'
 
 const appendMessage = vi.fn()
+const appendUserMessageWithinLimit = vi.fn()
 const streamChat = vi.fn()
 const listMessages = vi.fn()
 
 vi.mock('@/lib/db', () => ({
   appendMessage: (...args: unknown[]) => appendMessage(...args),
+  appendUserMessageWithinLimit: (...args: unknown[]) =>
+    appendUserMessageWithinLimit(...args),
   countRecentConversations: async () => 0,
   countUserMessages: async () => 0,
-  createConversation: async () => 'conversa-1',
+  createConversationWithinLimit: async () => 'conversa-1',
   getConversation: async () => null,
   listMessages: (...args: unknown[]) => listMessages(...args),
 }))
@@ -29,6 +33,8 @@ function requisicao(text: string) {
 beforeEach(() => {
   process.env.IP_HASH_SALT = 'salt-de-teste'
   appendMessage.mockReset()
+  appendUserMessageWithinLimit.mockReset()
+  appendUserMessageWithinLimit.mockResolvedValue(true)
   streamChat.mockReset()
   streamChat.mockImplementation(async function* () {
     throw new Error('vps fora do ar')
@@ -50,10 +56,10 @@ describe('POST /api/chat quando o modelo falha', () => {
     const { POST } = await import('@/app/api/chat/route')
     const resposta = await POST(requisicao('tenho uma loja'))
     await resposta.text()
-    expect(appendMessage).toHaveBeenCalledWith(
+    expect(appendUserMessageWithinLimit).toHaveBeenCalledWith(
       'conversa-1',
-      'user',
       'tenho uma loja',
+      LIMITS.userMessagesPerConversation,
     )
   })
 

@@ -2,16 +2,23 @@ import type { NextRequest } from 'next/server'
 import { ABERTURA } from '@/lib/abertura'
 import {
   appendMessage,
+  appendUserMessageWithinLimit,
   countRecentConversations,
   countUserMessages,
-  createConversation,
+  createConversationWithinLimit,
   getConversation,
   listMessages,
 } from '@/lib/db'
 import { hashIp } from '@/lib/hash'
 import { streamChat } from '@/lib/llm'
 import { buildChatMessages } from '@/lib/prompt'
-import { checkMessage, checkNewConversation } from '@/lib/rate-limit'
+import {
+  checkMessage,
+  checkNewConversation,
+  LIMITS,
+  RECUSA_IP,
+  RECUSA_MENSAGENS,
+} from '@/lib/rate-limit'
 import {
   clientIp,
   conversationCookieHeader,
@@ -55,7 +62,13 @@ export async function POST(req: NextRequest): Promise<Response> {
     if (!conversationId) {
       const veredito = await checkNewConversation(deps, ipHash)
       if (!veredito.ok) return texto(veredito.message, null)
-      conversationId = await createConversation(ipHash)
+
+      conversationId = await createConversationWithinLimit(
+        ipHash,
+        LIMITS.newConversationsPerHour,
+      )
+      if (!conversationId) return texto(RECUSA_IP, null)
+
       cookie = conversationCookieHeader(conversationId)
       await appendMessage(conversationId, 'assistant', ABERTURA)
     }
@@ -63,7 +76,13 @@ export async function POST(req: NextRequest): Promise<Response> {
     const veredito = await checkMessage(deps, conversationId, mensagem)
     if (!veredito.ok) return texto(veredito.message, cookie)
 
-    await appendMessage(conversationId, 'user', mensagem)
+    const gravou = await appendUserMessageWithinLimit(
+      conversationId,
+      mensagem,
+      LIMITS.userMessagesPerConversation,
+    )
+    if (!gravou) return texto(RECUSA_MENSAGENS, cookie)
+
     historico = await listMessages(conversationId)
   } catch {
     return texto(FALHA_DO_MODELO, cookie)
