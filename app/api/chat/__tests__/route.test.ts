@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ABERTURA } from '@/lib/abertura'
 
 const appendMessage = vi.fn()
 const streamChat = vi.fn()
+const listMessages = vi.fn()
 
 vi.mock('@/lib/db', () => ({
   appendMessage: (...args: unknown[]) => appendMessage(...args),
@@ -9,15 +11,7 @@ vi.mock('@/lib/db', () => ({
   countUserMessages: async () => 0,
   createConversation: async () => 'conversa-1',
   getConversation: async () => null,
-  listMessages: async () => [
-    {
-      id: 1,
-      role: 'user',
-      content: 'tenho uma loja',
-      incomplete: false,
-      createdAt: new Date(),
-    },
-  ],
+  listMessages: (...args: unknown[]) => listMessages(...args),
 }))
 
 vi.mock('@/lib/llm', () => ({
@@ -39,6 +33,16 @@ beforeEach(() => {
   streamChat.mockImplementation(async function* () {
     throw new Error('vps fora do ar')
   })
+  listMessages.mockReset()
+  listMessages.mockResolvedValue([
+    {
+      id: 1,
+      role: 'user',
+      content: 'tenho uma loja',
+      incomplete: false,
+      createdAt: new Date(),
+    },
+  ])
 })
 
 describe('POST /api/chat quando o modelo falha', () => {
@@ -63,7 +67,9 @@ describe('POST /api/chat quando o modelo falha', () => {
     const { POST } = await import('@/app/api/chat/route')
     const resposta = await POST(requisicao('tenho uma loja'))
     await resposta.text()
-    const gravacoes = appendMessage.mock.calls.filter((c) => c[1] === 'assistant')
+    const gravacoes = appendMessage.mock.calls.filter(
+      (c) => c[1] === 'assistant' && c[2] !== ABERTURA,
+    )
     expect(gravacoes).toHaveLength(0)
   })
 
@@ -77,7 +83,9 @@ describe('POST /api/chat quando o modelo falha', () => {
     const resposta = await POST(requisicao('umas 2 horas por dia'))
     expect(await resposta.text()).toBe('Duas horas por dia é meio expediente por semana')
 
-    const gravacao = appendMessage.mock.calls.find((c) => c[1] === 'assistant')
+    const gravacao = appendMessage.mock.calls.find(
+      (c) => c[1] === 'assistant' && c[2] !== ABERTURA,
+    )
     expect(gravacao?.[2]).toBe('Duas horas por dia é meio expediente por semana')
     expect(gravacao?.[3]).toBe(true)
   })
@@ -87,5 +95,38 @@ describe('POST /api/chat quando o modelo falha', () => {
     const { POST } = await import('@/app/api/chat/route')
     const resposta = await POST(requisicao('tenho uma loja'))
     expect(await resposta.text()).toContain('tenta de novo')
+  })
+
+  it('o modelo recebe a abertura como contexto já na primeira mensagem do visitante', async () => {
+    listMessages.mockResolvedValueOnce([
+      {
+        id: 1,
+        role: 'assistant',
+        content: ABERTURA,
+        incomplete: false,
+        createdAt: new Date(),
+      },
+      {
+        id: 2,
+        role: 'user',
+        content: 'tenho uma clínica de fisioterapia',
+        incomplete: false,
+        createdAt: new Date(),
+      },
+    ])
+    const { POST } = await import('@/app/api/chat/route')
+    const resposta = await POST(requisicao('tenho uma clínica de fisioterapia'))
+    await resposta.text()
+
+    expect(appendMessage).toHaveBeenCalledWith('conversa-1', 'assistant', ABERTURA)
+
+    const mensagens = streamChat.mock.calls[0][0]
+    expect(mensagens.map((m: { role: string }) => m.role)).toEqual([
+      'system',
+      'assistant',
+      'user',
+    ])
+    expect(mensagens[1].content).toBe(ABERTURA)
+    expect(mensagens[2].content).toBe('tenho uma clínica de fisioterapia')
   })
 })

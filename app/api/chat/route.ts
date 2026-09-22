@@ -1,4 +1,5 @@
 import type { NextRequest } from 'next/server'
+import { ABERTURA } from '@/lib/abertura'
 import {
   appendMessage,
   countRecentConversations,
@@ -56,6 +57,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       if (!veredito.ok) return texto(veredito.message, null)
       conversationId = await createConversation(ipHash)
       cookie = conversationCookieHeader(conversationId)
+      await appendMessage(conversationId, 'assistant', ABERTURA)
     }
 
     const veredito = await checkMessage(deps, conversationId, mensagem)

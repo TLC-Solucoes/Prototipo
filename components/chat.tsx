@@ -1,9 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-
-const ABERTURA =
-  'A gente automatiza tarefa repetitiva de negócio pequeno — o tipo de coisa que alguém aí faz na mão toda semana. Me conta o que você faz que eu te digo se dá pra tirar da sua mão.'
+import { ABERTURA } from '@/lib/abertura'
 
 const FALHA =
   'Não consegui responder agora. Sua mensagem foi guardada — tenta de novo em instantes.'
