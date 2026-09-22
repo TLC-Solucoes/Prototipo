@@ -1,0 +1,67 @@
+import { describe, expect, it } from 'vitest'
+import {
+  checkMessage,
+  checkNewConversation,
+  LIMITS,
+  type RateLimitDeps,
+} from '@/lib/rate-limit'
+
+function deps(conversas: number, mensagens: number): RateLimitDeps {
+  return {
+    countRecentConversations: async () => conversas,
+    countUserMessages: async () => mensagens,
+  }
+}
+
+describe('checkNewConversation', () => {
+  it('libera abaixo do teto', async () => {
+    const v = await checkNewConversation(deps(LIMITS.newConversationsPerHour - 1, 0), 'h')
+    expect(v.ok).toBe(true)
+  })
+
+  it('bloqueia no teto', async () => {
+    const v = await checkNewConversation(deps(LIMITS.newConversationsPerHour, 0), 'h')
+    expect(v.ok).toBe(false)
+  })
+
+  it('identifica o motivo como ip', async () => {
+    const v = await checkNewConversation(deps(99, 0), 'h')
+    expect(v.ok === false && v.reason).toBe('ip')
+  })
+
+  it('devolve mensagem pronta para o visitante ler', async () => {
+    const v = await checkNewConversation(deps(99, 0), 'h')
+    expect(v.ok === false && v.message.length).toBeGreaterThan(20)
+  })
+})
+
+describe('checkMessage', () => {
+  it('libera abaixo dos tetos', async () => {
+    const v = await checkMessage(deps(0, 3), 'c', 'tenho uma loja')
+    expect(v.ok).toBe(true)
+  })
+
+  it('bloqueia no teto de mensagens', async () => {
+    const v = await checkMessage(
+      deps(0, LIMITS.userMessagesPerConversation),
+      'c',
+      'oi',
+    )
+    expect(v.ok === false && v.reason).toBe('mensagens')
+  })
+
+  it('bloqueia mensagem longa demais', async () => {
+    const v = await checkMessage(deps(0, 0), 'c', 'a'.repeat(LIMITS.maxChars + 1))
+    expect(v.ok === false && v.reason).toBe('tamanho')
+  })
+
+  it('aceita mensagem exatamente no tamanho máximo', async () => {
+    const v = await checkMessage(deps(0, 0), 'c', 'a'.repeat(LIMITS.maxChars))
+    expect(v.ok).toBe(true)
+  })
+
+  it('rejeita mensagem vazia', async () => {
+    const v = await checkMessage(deps(0, 0), 'c', '   ')
+    expect(v.ok === false && v.reason).toBe('tamanho')
+  })
+})
