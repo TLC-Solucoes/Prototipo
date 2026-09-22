@@ -17,6 +17,10 @@ describe('conversationCookieHeader', () => {
   it('usa SameSite Lax', () => {
     expect(conversationCookieHeader('abc')).toContain('SameSite=Lax')
   })
+
+  it('dura duas horas, não a semana inteira', () => {
+    expect(conversationCookieHeader('abc')).toContain('Max-Age=7200')
+  })
 })
 
 describe('clientIp', () => {
