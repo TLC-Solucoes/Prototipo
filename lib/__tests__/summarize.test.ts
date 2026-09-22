@@ -17,6 +17,11 @@ vi.mock('@/lib/llm', () => ({
   complete: (...args: unknown[]) => complete(...args),
 }))
 
+const MENSAGENS = [
+  { id: 1, role: 'assistant', content: 'oi', incomplete: false, createdAt: new Date() },
+  { id: 2, role: 'user', content: 'tenho uma clínica', incomplete: false, createdAt: new Date() },
+]
+
 const RESUMO_JSON = JSON.stringify({
   segmento: 'clínica',
   dorPrincipal: 'remarcar consulta na mão',
@@ -31,10 +36,7 @@ beforeEach(() => {
     summaryInputHash: null,
   })
   listMessages.mockReset()
-  listMessages.mockResolvedValue([
-    { id: 1, role: 'assistant', content: 'oi', incomplete: false, createdAt: new Date() },
-    { id: 2, role: 'user', content: 'tenho uma clínica', incomplete: false, createdAt: new Date() },
-  ])
+  listMessages.mockResolvedValue(MENSAGENS)
   saveSummary.mockReset()
   claimSummarySlot.mockReset()
   claimSummarySlot.mockResolvedValue(true)
@@ -71,6 +73,27 @@ describe('summarizeConversation', () => {
     const { summarizeConversation } = await import('@/lib/summarize')
     await summarizeConversation('c1', false)
     expect(claimSummarySlot).toHaveBeenCalledWith('c1', 60)
+  })
+
+  it('carimba o resumo com o instante em que o transcript foi lido', async () => {
+    let lidoEm = 0
+    listMessages.mockImplementation(async () => {
+      lidoEm = Date.now()
+      await new Promise((r) => setTimeout(r, 5))
+      return MENSAGENS
+    })
+    complete.mockImplementation(async () => {
+      await new Promise((r) => setTimeout(r, 15))
+      return RESUMO_JSON
+    })
+
+    const { summarizeConversation } = await import('@/lib/summarize')
+    await summarizeConversation('c1', false)
+
+    const carimbo = saveSummary.mock.calls[0][3] as Date
+    expect(carimbo).toBeInstanceOf(Date)
+    expect(carimbo.getTime()).toBeLessThanOrEqual(lidoEm)
+    expect(Date.now() - carimbo.getTime()).toBeGreaterThanOrEqual(15)
   })
 
   it('o painel ignora o cooldown', async () => {

@@ -132,13 +132,14 @@ export async function saveSummary(
   conversationId: string,
   summary: Summary,
   inputHash: string,
+  transcriptReadAt: Date,
 ): Promise<void> {
   const { nome, email, telefone } = summary.contato
   const status = nome || email || telefone ? 'com_contato' : 'aberta'
   await sql`
     update conversation
        set summary = ${JSON.stringify(summary)}::jsonb,
-           summary_updated_at = now(),
+           summary_updated_at = ${transcriptReadAt.toISOString()}::timestamptz,
            summary_input_hash = ${inputHash},
            contact_name = coalesce(${nome}, contact_name),
            contact_email = coalesce(${email}, contact_email),

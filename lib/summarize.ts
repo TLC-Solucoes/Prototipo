@@ -11,6 +11,7 @@ export async function summarizeConversation(
   const conversa = await getConversation(conversationId)
   if (!conversa) return false
 
+  const lidoEm = new Date()
   const mensagens = await listMessages(conversationId)
   if (mensagens.length < 2) return false
 
@@ -44,6 +45,6 @@ export async function summarizeConversation(
     return false
   }
 
-  await saveSummary(conversationId, resumo, transcriptHash)
+  await saveSummary(conversationId, resumo, transcriptHash, lidoEm)
   return true
 }
