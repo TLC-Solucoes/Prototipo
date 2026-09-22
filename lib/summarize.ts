@@ -1,0 +1,41 @@
+import { getConversation, listMessages, saveSummary } from '@/lib/db'
+import { hashTranscript } from '@/lib/hash'
+import { complete } from '@/lib/llm'
+import { parseSummary, SUMMARY_INSTRUCTION } from '@/lib/summary'
+import { shouldSummarize } from '@/lib/summarize-guard'
+
+export async function summarizeConversation(
+  conversationId: string,
+  force: boolean,
+): Promise<boolean> {
+  const conversa = await getConversation(conversationId)
+  if (!conversa) return false
+
+  const mensagens = await listMessages(conversationId)
+  if (mensagens.length < 2) return false
+
+  const transcriptHash = hashTranscript(mensagens)
+  const permitido = shouldSummarize({
+    summaryUpdatedAt: conversa.summaryUpdatedAt,
+    summaryInputHash: conversa.summaryInputHash,
+    transcriptHash,
+    now: new Date(),
+    force,
+  })
+  if (!permitido) return false
+
+  const transcript = mensagens
+    .map((m) => `${m.role === 'user' ? 'Visitante' : 'Consultor'}: ${m.content}`)
+    .join('\n')
+
+  const bruto = await complete([
+    { role: 'system', content: SUMMARY_INSTRUCTION },
+    { role: 'user', content: transcript },
+  ])
+
+  const resumo = parseSummary(bruto)
+  if (!resumo) return false
+
+  await saveSummary(conversationId, resumo, transcriptHash)
+  return true
+}
