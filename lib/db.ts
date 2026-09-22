@@ -121,3 +121,17 @@ export async function listConversations(limit: number): Promise<AdminRow[]> {
     summaryInputHash: r.summary_input_hash,
   }))
 }
+
+export async function claimSummarySlot(
+  conversationId: string,
+  cooldownSeconds: number,
+): Promise<boolean> {
+  const rows = await sql`
+    update conversation set summary_updated_at = now()
+     where id = ${conversationId}
+       and (summary_updated_at is null
+            or summary_updated_at < now() - make_interval(secs => ${cooldownSeconds}))
+    returning id
+  `
+  return rows.length > 0
+}

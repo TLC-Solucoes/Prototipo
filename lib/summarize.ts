@@ -1,8 +1,8 @@
-import { getConversation, listMessages, saveSummary } from '@/lib/db'
+import { claimSummarySlot, getConversation, listMessages, saveSummary } from '@/lib/db'
 import { hashTranscript } from '@/lib/hash'
 import { complete } from '@/lib/llm'
 import { parseSummary, SUMMARY_INSTRUCTION } from '@/lib/summary'
-import { shouldSummarize } from '@/lib/summarize-guard'
+import { COOLDOWN_MS, shouldSummarize } from '@/lib/summarize-guard'
 
 export async function summarizeConversation(
   conversationId: string,
@@ -23,6 +23,11 @@ export async function summarizeConversation(
     force,
   })
   if (!permitido) return false
+
+  if (!force) {
+    const vaga = await claimSummarySlot(conversationId, COOLDOWN_MS / 1000)
+    if (!vaga) return false
+  }
 
   const transcript = mensagens
     .map((m) => `${m.role === 'user' ? 'Visitante' : 'Consultor'}: ${m.content}`)
