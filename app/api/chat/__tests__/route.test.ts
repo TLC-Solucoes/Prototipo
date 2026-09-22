@@ -4,7 +4,7 @@ import { LIMITS, maxConversasHora } from '@/lib/rate-limit'
 
 const appendMessage = vi.fn()
 const appendUserMessageWithinLimit = vi.fn()
-const countConversationsLastHour = vi.fn()
+const createConversationWithinLimit = vi.fn()
 const streamChat = vi.fn()
 const listMessages = vi.fn()
 
@@ -12,10 +12,10 @@ vi.mock('@/lib/db', () => ({
   appendMessage: (...args: unknown[]) => appendMessage(...args),
   appendUserMessageWithinLimit: (...args: unknown[]) =>
     appendUserMessageWithinLimit(...args),
-  countConversationsLastHour: (...args: unknown[]) => countConversationsLastHour(...args),
   countRecentConversations: async () => 0,
   countUserMessages: async () => 0,
-  createConversationWithinLimit: async () => 'conversa-1',
+  createConversationWithinLimit: (...args: unknown[]) =>
+    createConversationWithinLimit(...args),
   getConversation: async () => null,
   listMessages: (...args: unknown[]) => listMessages(...args),
 }))
@@ -38,8 +38,8 @@ beforeEach(() => {
   appendMessage.mockReset()
   appendUserMessageWithinLimit.mockReset()
   appendUserMessageWithinLimit.mockResolvedValue(true)
-  countConversationsLastHour.mockReset()
-  countConversationsLastHour.mockResolvedValue(0)
+  createConversationWithinLimit.mockReset()
+  createConversationWithinLimit.mockResolvedValue({ id: 'conversa-1' })
   streamChat.mockReset()
   streamChat.mockImplementation(async function* () {
     throw new Error('vps fora do ar')
@@ -69,13 +69,34 @@ describe('POST /api/chat quando o modelo falha', () => {
   })
 
   it('recusa conversa nova quando o teto global da hora estourou', async () => {
-    countConversationsLastHour.mockResolvedValue(maxConversasHora())
+    createConversationWithinLimit.mockResolvedValue({ id: null, motivo: 'global' })
     const { POST } = await import('@/app/api/chat/route')
     const resposta = await POST(requisicao('tenho uma loja'))
 
     expect(await resposta.text()).toContain('muita gente')
     expect(appendUserMessageWithinLimit).not.toHaveBeenCalled()
     expect(streamChat).not.toHaveBeenCalled()
+  })
+
+  it('recusa com a frase do teto por IP quando foi o IP que estourou', async () => {
+    createConversationWithinLimit.mockResolvedValue({ id: null, motivo: 'ip' })
+    const { POST } = await import('@/app/api/chat/route')
+    const resposta = await POST(requisicao('tenho uma loja'))
+
+    expect(await resposta.text()).toContain('conversas por aqui')
+    expect(streamChat).not.toHaveBeenCalled()
+  })
+
+  it('leva os dois tetos para a guarda do banco decidir', async () => {
+    const { POST } = await import('@/app/api/chat/route')
+    const resposta = await POST(requisicao('tenho uma loja'))
+    await resposta.text()
+
+    expect(createConversationWithinLimit).toHaveBeenCalledWith(
+      expect.any(String),
+      LIMITS.newConversationsPerHour,
+      maxConversasHora(),
+    )
   })
 
   it('não vaza erro cru quando falta o salt do hash de IP', async () => {

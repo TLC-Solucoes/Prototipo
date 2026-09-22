@@ -52,3 +52,7 @@ export type AdminRow = {
   temResumo: boolean
   desatualizado: boolean
 }
+
+export type ConversationSlot =
+  | { id: string }
+  | { id: null; motivo: 'ip' | 'global' }

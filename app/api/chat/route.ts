@@ -3,7 +3,6 @@ import { ABERTURA } from '@/lib/abertura'
 import {
   appendMessage,
   appendUserMessageWithinLimit,
-  countConversationsLastHour,
   countRecentConversations,
   countUserMessages,
   createConversationWithinLimit,
@@ -73,16 +72,16 @@ export async function POST(req: NextRequest): Promise<Response> {
       const veredito = await checkNewConversation(deps, ipHash)
       if (!veredito.ok) return texto(veredito.message, null)
 
-      if ((await countConversationsLastHour()) >= maxConversasHora()) {
-        return texto(RECUSA_GLOBAL, null)
-      }
-
-      conversationId = await createConversationWithinLimit(
+      const vaga = await createConversationWithinLimit(
         ipHash,
         LIMITS.newConversationsPerHour,
+        maxConversasHora(),
       )
-      if (!conversationId) return texto(RECUSA_IP, null)
+      if (vaga.id === null) {
+        return texto(vaga.motivo === 'global' ? RECUSA_GLOBAL : RECUSA_IP, null)
+      }
 
+      conversationId = vaga.id
       cookie = conversationCookieHeader(conversationId)
       await appendMessage(conversationId, 'assistant', ABERTURA)
     }

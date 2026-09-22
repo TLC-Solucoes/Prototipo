@@ -20,10 +20,6 @@ vi.mock('@/lib/db', () => ({
     mensagensDoUsuario.push(content)
     return true
   },
-  countConversationsLastHour: async () => {
-    await latencia()
-    return conversas.length
-  },
   countRecentConversations: async () => {
     await latencia()
     return conversas.length
@@ -34,10 +30,10 @@ vi.mock('@/lib/db', () => ({
   },
   createConversationWithinLimit: async (_ipHash: string, perHour: number) => {
     await latencia()
-    if (conversas.length >= perHour) return null
+    if (conversas.length >= perHour) return { id: null, motivo: 'ip' }
     const id = `conversa-${conversas.length + 1}`
     conversas.push(id)
-    return id
+    return { id }
   },
   getConversation: async (id: string) => (id ? { id } : null),
   listMessages: async () => [
@@ -65,8 +61,8 @@ beforeEach(() => {
   mensagensDoUsuario.length = 0
 })
 
-describe('POST /api/chat com requisições simultâneas', () => {
-  it('não cria mais conversas que o teto por IP', async () => {
+describe('POST /api/chat em paralelo, com a guarda do banco fingida atômica', () => {
+  it('a rota deixa a guarda decidir e não cria conversa além do teto por IP', async () => {
     const { POST } = await import('@/app/api/chat/route')
     const disparos = Array.from({ length: 20 }, () => POST(requisicao(null)))
     const respostas = await Promise.all(disparos)
@@ -75,7 +71,7 @@ describe('POST /api/chat com requisições simultâneas', () => {
     expect(conversas).toHaveLength(LIMITS.newConversationsPerHour)
   })
 
-  it('recusa em português o que passou do teto por IP', async () => {
+  it('a rota recusa em português tudo o que a guarda não deixou criar', async () => {
     const { POST } = await import('@/app/api/chat/route')
     const respostas = await Promise.all(
       Array.from({ length: 20 }, () => POST(requisicao(null))),
@@ -86,7 +82,7 @@ describe('POST /api/chat com requisições simultâneas', () => {
     expect(recusas).toHaveLength(20 - LIMITS.newConversationsPerHour)
   })
 
-  it('não grava mais mensagens que o teto por conversa', async () => {
+  it('a rota deixa a guarda decidir e não grava mensagem além do teto', async () => {
     const { POST } = await import('@/app/api/chat/route')
     const disparos = Array.from({ length: LIMITS.userMessagesPerConversation + 15 }, () =>
       POST(requisicao('conversa-1')),
