@@ -162,7 +162,7 @@ que falha a extração deixa o registro anterior intacto em vez de apagá-lo.
 
 ## Painel
 
-`/admin`, protegido por Basic Auth em `middleware.ts` contra `ADMIN_PASSWORD`. Lista
+`/admin`, protegido por Basic Auth em `proxy.ts` contra `ADMIN_PASSWORD`. Lista
 as conversas mais recentes com data, status, contato e a dor principal do resumo;
 abrir uma mostra o transcript completo e o JSON.
 

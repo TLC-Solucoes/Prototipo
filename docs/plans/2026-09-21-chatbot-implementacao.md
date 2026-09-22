@@ -229,6 +229,7 @@ export type AdminRow = {
 Create `lib/db.ts`:
 
 ```ts
+import 'server-only'
 import { neon } from '@neondatabase/serverless'
 import type { AdminRow, Conversation, Message, Role, Summary } from '@/lib/types'
 
@@ -1947,26 +1948,30 @@ git commit -m "feat: add chat page with debounced summary trigger"
 ### Task 12: Painel
 
 **Files:**
-- Create: `middleware.ts`, `app/admin/page.tsx`, `app/admin/[id]/page.tsx`, `app/admin/api/resumo/route.ts`, `components/botao-resumo.tsx`
+- Create: `proxy.ts`, `app/admin/page.tsx`, `app/admin/[id]/page.tsx`, `app/admin/api/resumo/route.ts`, `components/botao-resumo.tsx`
 
 **Interfaces:**
 - Consumes: `lib/db.ts`, `lib/hash.ts`, `lib/summarize.ts`
 - Produces: `/admin`, `/admin/<id>`, e `POST /admin/api/resumo` com corpo `{ id: string }`
 
-O `matcher` do middleware cobre `/admin/:path*`, então a rota de regerar resumo fica protegida pela mesma senha — é por isso que ela pode passar `force: true` sem checagem própria.
+O `matcher` do proxy cobre `/admin/:path*`, então a rota de regerar resumo fica protegida pela mesma senha — é por isso que ela pode passar `force: true` sem checagem própria.
 
-- [ ] **Step 1: Escrever o middleware**
+O Next 16 renomeou `middleware.ts` para `proxy.ts` e o export `middleware` para `proxy`; a forma antiga está depreciada. O arquivo fica na raiz do projeto, ao lado de `app/`. Proxy roda sempre no runtime Node, e declarar `export const runtime` nele lança erro — por isso a credencial usa `Buffer`, e não `btoa`.
 
-Create `middleware.ts`:
+- [ ] **Step 1: Escrever o proxy**
+
+Create `proxy.ts`:
 
 ```ts
 import { NextResponse, type NextRequest } from 'next/server'
 
 export const config = { matcher: '/admin/:path*' }
 
-export function middleware(req: NextRequest) {
-  const esperado = `Basic ${btoa(`tlc:${process.env.ADMIN_PASSWORD}`)}`
-  if (req.headers.get('authorization') !== esperado) {
+export function proxy(req: NextRequest) {
+  const credencial = Buffer.from(`tlc:${process.env.ADMIN_PASSWORD}`).toString(
+    'base64',
+  )
+  if (req.headers.get('authorization') !== `Basic ${credencial}`) {
     return new NextResponse('Autenticação necessária', {
       status: 401,
       headers: { 'WWW-Authenticate': 'Basic realm="TLC"' },
@@ -2301,7 +2306,7 @@ Expected: PASS em todos os arquivos.
 - [ ] **Step 8: Commit**
 
 ```bash
-git add middleware.ts app/admin components/botao-resumo.tsx
+git add proxy.ts app/admin components/botao-resumo.tsx
 git commit -m "feat: add password-protected leads panel"
 ```
 
