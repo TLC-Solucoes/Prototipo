@@ -58,21 +58,22 @@ importa React.
 ## Modelo de dados
 
 ```sql
-create table conversation (
-  id            uuid primary key default gen_random_uuid(),
-  created_at    timestamptz not null default now(),
-  updated_at    timestamptz not null default now(),
-  ip_hash       text not null,
-  status        text not null default 'aberta',
-  contact_name  text,
-  contact_email text,
-  contact_phone text,
-  summary       jsonb,
-  summary_updated_at timestamptz,
-  summary_input_hash text
+create table if not exists conversation (
+  id                   uuid primary key default gen_random_uuid(),
+  created_at           timestamptz not null default now(),
+  updated_at           timestamptz not null default now(),
+  ip_hash              text not null,
+  status               text not null default 'aberta',
+  contact_name         text,
+  contact_email        text,
+  contact_phone        text,
+  summary              jsonb,
+  summary_updated_at   timestamptz,
+  summary_attempted_at timestamptz,
+  summary_input_hash   text
 );
 
-create table message (
+create table if not exists message (
   id              bigserial primary key,
   conversation_id uuid not null references conversation(id) on delete cascade,
   role            text not null check (role in ('user', 'assistant')),
@@ -81,14 +82,21 @@ create table message (
   created_at      timestamptz not null default now()
 );
 
-create index message_conversation_idx on message (conversation_id, id);
-create index conversation_ip_recent_idx on conversation (ip_hash, created_at desc);
+create index if not exists message_conversation_idx on message (conversation_id, id);
+create index if not exists conversation_ip_recent_idx on conversation (ip_hash, created_at desc);
+create index if not exists conversation_created_idx on conversation (created_at desc);
 ```
 
 `status` assume `aberta` ou `com_contato`. `message.incomplete` marca resposta cujo
 stream cortou no meio, para o painel não tratar um texto truncado como final. `summary` guarda o JSON descrito em
 `roteiro-diagnostico.md` (segmento, dor, frequência, responsável, consequência,
 ferramentas, urgência, adequação ao ICP).
+
+`summary_updated_at` só é escrito quando um resumo é salvo, e carrega o instante em que
+o transcript foi lido, não o da gravação: significa "o resumo guardado reflete a conversa
+até aqui", que é o que o painel pergunta ao comparar com `updated_at`.
+`summary_attempted_at` é coluna separada, do cooldown — a tentativa marca ali antes de
+chamar o modelo, então extração que falha continua aparecendo como desatualizada.
 
 Guarda-se `ip_hash` (SHA-256 do IP com salt), nunca o IP. Serve ao rate limit e não
 cria um cadastro de endereço de ninguém.
