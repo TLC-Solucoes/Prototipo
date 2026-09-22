@@ -16,6 +16,7 @@ import {
   chatPausado,
   checkMessage,
   checkNewConversation,
+  checkTextSize,
   LIMITS,
   maxConversasHora,
   PAUSADO,
@@ -57,6 +58,9 @@ export async function POST(req: NextRequest): Promise<Response> {
   }
 
   const mensagem = corpo.text.trim()
+  const tamanho = checkTextSize(mensagem)
+  if (!tamanho.ok) return texto(tamanho.message, null)
+
   let conversationId: string | null = null
   let cookie: string | null = null
   let historico: Awaited<ReturnType<typeof listMessages>>

@@ -184,6 +184,25 @@ describe('POST /api/chat quando o modelo falha', () => {
     expect(await resposta.text()).not.toContain('guardada')
   })
 
+  it('não abre conversa para mensagem vazia', async () => {
+    const { POST } = await import('@/app/api/chat/route')
+    const resposta = await POST(requisicao('   '))
+
+    expect(await resposta.text()).toContain('caracteres')
+    expect(createConversationWithinLimit).not.toHaveBeenCalled()
+    expect(appendMessage).not.toHaveBeenCalled()
+    expect(streamChat).not.toHaveBeenCalled()
+  })
+
+  it('não abre conversa para mensagem longa demais', async () => {
+    const { POST } = await import('@/app/api/chat/route')
+    const resposta = await POST(requisicao('a'.repeat(LIMITS.maxChars + 1)))
+
+    expect(await resposta.text()).toContain('caracteres')
+    expect(createConversationWithinLimit).not.toHaveBeenCalled()
+    expect(appendMessage).not.toHaveBeenCalled()
+  })
+
   it('o modelo recebe a abertura como contexto já na primeira mensagem do visitante', async () => {
     listMessages.mockResolvedValueOnce([
       {

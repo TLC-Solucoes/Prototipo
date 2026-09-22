@@ -3,6 +3,7 @@ import {
   chatPausado,
   checkMessage,
   checkNewConversation,
+  checkTextSize,
   CONVERSAS_POR_HORA_PADRAO,
   LIMITS,
   maxConversasHora,
@@ -66,6 +67,30 @@ describe('checkMessage', () => {
   it('rejeita mensagem vazia', async () => {
     const v = await checkMessage(deps(0, 0), 'c', '   ')
     expect(v.ok === false && v.reason).toBe('tamanho')
+  })
+})
+
+describe('checkTextSize', () => {
+  it('não precisa de conversa para recusar mensagem vazia', () => {
+    const v = checkTextSize('   ')
+    expect(v.ok === false && v.reason).toBe('tamanho')
+  })
+
+  it('não precisa de conversa para recusar mensagem longa demais', () => {
+    const v = checkTextSize('a'.repeat(LIMITS.maxChars + 1))
+    expect(v.ok === false && v.reason).toBe('tamanho')
+  })
+
+  it('libera mensagem exatamente no tamanho máximo', () => {
+    expect(checkTextSize('a'.repeat(LIMITS.maxChars)).ok).toBe(true)
+  })
+
+  it('devolve a mesma recusa que checkMessage', async () => {
+    const pelaMensagem = await checkMessage(deps(0, 0), 'c', '')
+    const peloTamanho = checkTextSize('')
+    expect(peloTamanho.ok === false && peloTamanho.message).toBe(
+      pelaMensagem.ok === false && pelaMensagem.message,
+    )
   })
 })
 

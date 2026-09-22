@@ -54,11 +54,7 @@ export async function checkNewConversation(
   return { ok: true }
 }
 
-export async function checkMessage(
-  deps: RateLimitDeps,
-  conversationId: string,
-  text: string,
-): Promise<Verdict> {
+export function checkTextSize(text: string): Verdict {
   const limpo = text.trim()
   if (limpo.length === 0 || limpo.length > LIMITS.maxChars) {
     return {
@@ -67,6 +63,16 @@ export async function checkMessage(
       message: `Manda em até ${LIMITS.maxChars} caracteres que eu consigo te acompanhar melhor.`,
     }
   }
+  return { ok: true }
+}
+
+export async function checkMessage(
+  deps: RateLimitDeps,
+  conversationId: string,
+  text: string,
+): Promise<Verdict> {
+  const tamanho = checkTextSize(text)
+  if (!tamanho.ok) return tamanho
 
   const enviadas = await deps.countUserMessages(conversationId)
   if (enviadas >= LIMITS.userMessagesPerConversation) {
