@@ -1,0 +1,3 @@
+## 2025-05-18 - Natural Chat UX & Screen Reader Live Regions
+**Learning:** In conversational interfaces designed for business diagnosis, robotic AI cursors or rigid disclaimer disclaimers break immersion and trust. Replacing harsh block cursors with subtle animated indicators, making disclaimers natural/human-friendly, and pairing incoming messages with `aria-live="polite"` gives both visual delight to sighted visitors and accessible real-time updates to screen reader users.
+**Action:** Always complement typing indicators with `aria-live` regions on streaming messages and `focus-within`/`focus-visible` ring indicators on custom chat input containers.
