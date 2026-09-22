@@ -89,4 +89,22 @@ describe('parseSummary', () => {
   it('continua devolvendo null para json malformado', () => {
     expect(parseSummary('{ "segmento": "Loja", ')).toBeNull()
   })
+
+  it('devolve null para objeto vazio', () => {
+    expect(parseSummary('{}')).toBeNull()
+  })
+
+  it('devolve null quando o objeto só tem chaves desconhecidas', () => {
+    expect(parseSummary('{"erro": "não consegui", "motivo": "conversa curta"}')).toBeNull()
+  })
+
+  it('devolve null para prosa acompanhada de objeto vazio', () => {
+    expect(parseSummary('Desculpe, não consegui extrair nada: {}')).toBeNull()
+  })
+
+  it('ignora o objeto vazio e fica com o resumo de verdade', () => {
+    const s = parseSummary(`{}\n\nNa verdade é assim:\n${completo}\n{}`)
+    expect(s?.dorPrincipal).toBe('Confirmação de consulta uma a uma no WhatsApp')
+    expect(s?.contato.nome).toBe('Marina')
+  })
 })

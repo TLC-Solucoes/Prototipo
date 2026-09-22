@@ -87,6 +87,7 @@ function extrairJson(raw: string): unknown {
 
     const objeto = valor as Record<string, unknown>
     const pontuacao = CHAVES_CONHECIDAS.filter((chave) => chave in objeto).length
+    if (pontuacao === 0) continue
     if (pontuacao >= melhorPontuacao) {
       melhorPontuacao = pontuacao
       escolhido = objeto
