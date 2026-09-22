@@ -116,10 +116,11 @@ export function Chat() {
               <p
                 key={indice}
                 className="text-[16px] leading-relaxed text-[#E6E1D8] sm:text-[18px]"
+                aria-live={indice === mensagens.length - 1 ? 'polite' : undefined}
               >
                 {mensagem.content}
                 {enviando && indice === mensagens.length - 1 ? (
-                  <span className="ml-1 inline-block h-[17px] w-[8px] align-[-3px] bg-[#D9793F] sm:h-[19px] sm:w-[9px]" />
+                  <span className="ml-1.5 inline-block size-2 rounded-full bg-[#D9793F] animate-pulse align-[1px]" aria-hidden="true" />
                 ) : null}
               </p>
             ) : (
@@ -137,7 +138,7 @@ export function Chat() {
       <div className="shrink-0 px-5 pb-6 pt-3 sm:px-10 sm:pb-10 sm:pt-4">
         <form
           onSubmit={enviar}
-          className="mx-auto flex w-full max-w-[680px] items-end gap-3 rounded-[15px] border border-[#33302A] bg-[#1C1A17] py-3 pl-4 pr-3 sm:rounded-2xl sm:pl-5"
+          className="mx-auto flex w-full max-w-[680px] items-end gap-3 rounded-[15px] border border-[#33302A] bg-[#1C1A17] py-3 pl-4 pr-3 transition-colors focus-within:border-[#D9793F]/70 focus-within:ring-2 focus-within:ring-[#D9793F]/40 sm:rounded-2xl sm:pl-5"
         >
           <label htmlFor="mensagem" className="sr-only">
             Sua mensagem
@@ -155,8 +156,9 @@ export function Chat() {
           <button
             type="submit"
             disabled={enviando || texto.trim() === ''}
-            aria-label="Enviar mensagem"
-            className="flex size-11 shrink-0 items-center justify-center rounded-[11px] bg-[#D9793F] disabled:bg-[#33302A]"
+            aria-label={enviando ? 'Enviando...' : 'Enviar mensagem'}
+            aria-busy={enviando}
+            className="flex size-11 shrink-0 items-center justify-center rounded-[11px] bg-[#D9793F] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D9793F] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1C1A17] disabled:bg-[#33302A]"
           >
             <svg
               width="18"
@@ -175,8 +177,8 @@ export function Chat() {
           </button>
         </form>
         <p className="mx-auto mt-2.5 max-w-[680px] text-center text-[11px] text-[#6F6A62] sm:text-[12px]">
-          Suas respostas ficam com a TLC Soluções e servem pra montar sua proposta.
-          Este assistente não passa preço nem prazo.
+          Suas respostas ficam salvas com a TLC Soluções para elaboração da sua proposta.
+          Não informamos preços ou prazos nesta etapa.
         </p>
       </div>
     </div>
