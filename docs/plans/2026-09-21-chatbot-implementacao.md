@@ -16,7 +16,10 @@
 - **Runtime Node** em toda route handler: `export const runtime = 'nodejs'`.
 - **Nenhum SQL fora de `lib/db.ts`.** Rotas e componentes chamam funções nomeadas.
 - **Nenhum módulo de `lib/` importa React.**
-- **Português do Brasil** em todo texto visível ao usuário. Identificadores em inglês.
+- **Português do Brasil** em todo texto visível ao usuário. A **API exportada** de cada
+  módulo é em inglês (`hashIp`, `parseSummary`, `checkMessage`); variáveis locais podem
+  ser em português, e os campos de `Summary` são em português de propósito, porque são
+  vocabulário de negócio do time (`dorPrincipal`, `ferramentas`, `urgencia`).
 - **O bot nunca cita preço, prazo ou promessa de escopo** — ver `lib/prompt.ts`.
 - Variáveis de ambiente: `OPENAI_BASE_URL`, `OPENAI_API_KEY`, `MODEL_NAME`, `MODEL_NAME_EXTRACT` (cai para `MODEL_NAME`), `DATABASE_URL`, `ADMIN_PASSWORD`, `IP_HASH_SALT`.
 - Limites fixos: 5 conversas novas por IP por hora, 40 mensagens de usuário por conversa, 2000 caracteres por mensagem, 1 extração por conversa a cada 60 s.
