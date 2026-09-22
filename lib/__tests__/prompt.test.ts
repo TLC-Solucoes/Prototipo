@@ -4,8 +4,12 @@ import { buildChatMessages, buildSystemPrompt } from '@/lib/prompt'
 describe('buildSystemPrompt', () => {
   const prompt = buildSystemPrompt()
 
-  it('proíbe falar preço', () => {
-    expect(prompt).toContain('preço')
+  it('proíbe falar preço sem deixar brecha', () => {
+    expect(prompt).toContain('Nunca fale preço')
+  })
+
+  it('enumera o escopo da proibição de preço', () => {
+    expect(prompt).toContain('nenhum valor, nenhuma faixa')
   })
 
   it('manda fazer uma pergunta por mensagem', () => {
@@ -13,13 +17,20 @@ describe('buildSystemPrompt', () => {
   })
 
   it('carrega os cinco estágios do roteiro', () => {
-    for (const estagio of ['negócio', 'repete', 'tempo', 'usa hoje', 'contato']) {
+    const estagios = [
+      'Que negócio é o dela',
+      'Que tarefa se repete toda semana',
+      'Quanto tempo por semana isso toma',
+      'O que ela usa hoje',
+      'O nome dela e o melhor contato',
+    ]
+    for (const estagio of estagios) {
       expect(prompt).toContain(estagio)
     }
   })
 
-  it('não cita valor nenhum em reais', () => {
-    expect(prompt).not.toMatch(/R\$/)
+  it('não cita valor em reais, nem símbolo nem por extenso', () => {
+    expect(prompt).not.toMatch(/R\$|\breais\b/i)
   })
 })
 
