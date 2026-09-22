@@ -124,7 +124,7 @@ git commit -m "feat: scaffold next.js project with vitest"
 ### Task 2: Schema e camada de banco
 
 **Files:**
-- Create: `db/schema.sql`, `scripts/migrate.ts`, `lib/db.ts`, `lib/types.ts`
+- Create: `db/schema.sql`, `scripts/migrate.mts`, `lib/db.ts`, `lib/types.ts`
 - Modify: `package.json` (script `db:migrate`)
 
 **Interfaces:**
@@ -356,7 +356,7 @@ export async function listConversations(limit: number): Promise<AdminRow[]> {
 
 - [ ] **Step 4: Escrever o script de migração**
 
-Create `scripts/migrate.ts`:
+Create `scripts/migrate.mts`:
 
 ```ts
 import { readFileSync } from 'node:fs'
@@ -384,7 +384,7 @@ console.log(`aplicados ${statements.length} comandos`)
 Adicionar em `package.json`, dentro de `scripts`:
 
 ```json
-"db:migrate": "node --env-file=.env.local scripts/migrate.ts"
+"db:migrate": "node --env-file=.env.local scripts/migrate.mts"
 ```
 
 - [ ] **Step 5: Verificar a tipagem**
