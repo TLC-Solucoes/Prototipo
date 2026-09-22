@@ -103,8 +103,11 @@ export async function POST(req: NextRequest): Promise<Response> {
       } catch (erro) {
         incompleta = true
         console.error('chat: stream do modelo falhou', erro)
-        if (completo === '') controller.enqueue(encoder.encode(FALHA_DO_MODELO))
       } finally {
+        if (completo === '') {
+          if (!incompleta) console.error('chat: o stream terminou sem conteúdo')
+          controller.enqueue(encoder.encode(FALHA_DO_MODELO))
+        }
         try {
           if (completo !== '') await appendMessage(id, 'assistant', completo, incompleta)
         } catch (erro) {

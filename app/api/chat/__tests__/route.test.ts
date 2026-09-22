@@ -79,6 +79,24 @@ describe('POST /api/chat quando o modelo falha', () => {
     expect(gravacoes).toHaveLength(0)
   })
 
+  it('avisa o visitante quando o stream termina vazio sem erro nenhum', async () => {
+    streamChat.mockImplementation(async function* () {})
+    const { POST } = await import('@/app/api/chat/route')
+    const resposta = await POST(requisicao('tenho uma loja'))
+    expect(await resposta.text()).toContain('tenta de novo')
+  })
+
+  it('não grava nada quando o stream termina vazio', async () => {
+    streamChat.mockImplementation(async function* () {})
+    const { POST } = await import('@/app/api/chat/route')
+    const resposta = await POST(requisicao('tenho uma loja'))
+    await resposta.text()
+    const gravacoes = appendMessage.mock.calls.filter(
+      (c) => c[1] === 'assistant' && c[2] !== ABERTURA,
+    )
+    expect(gravacoes).toHaveLength(0)
+  })
+
   it('grava o parcial e marca como incompleta quando o stream corta no meio', async () => {
     streamChat.mockImplementation(async function* () {
       yield 'Duas horas por dia é '
