@@ -1,29 +1,34 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import type { Metadata } from 'next'
+import { Fraunces, Public_Sans } from 'next/font/google'
+import './globals.css'
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  weight: ['400', '600'],
+  variable: '--font-display',
+})
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const publicSans = Public_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-body',
+})
 
 export const metadata: Metadata = {
-  title: "Diagnóstico de Automação",
-  description: "Converse com um consultor de IA e descubra onde automatizar seu negócio.",
-};
+  title: 'TLC Soluções',
+  description: 'Automação para negócio pequeno.',
+}
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <html
-      lang="pt-BR"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="pt-BR" className={`${fraunces.variable} ${publicSans.variable}`}>
+      <body className="bg-[#12110F] text-[#F2EFE9] font-[family-name:var(--font-body)] antialiased">
+        {children}
+      </body>
     </html>
-  );
+  )
 }
