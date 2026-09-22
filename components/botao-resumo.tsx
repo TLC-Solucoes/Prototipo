@@ -44,8 +44,7 @@ export function BotaoResumo({ id, rotulo }: { id: string; rotulo: string }) {
         type="button"
         onClick={gerar}
         disabled={rodando}
-        aria-busy={rodando}
-        className="min-h-11 shrink-0 rounded-[9px] border border-[#45403A] px-3.5 text-[13px] font-semibold text-[#C9C2B6] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D9793F] disabled:opacity-50"
+        className="min-h-11 shrink-0 rounded-[9px] border border-[#45403A] px-3.5 text-[13px] font-semibold text-[#C9C2B6] disabled:opacity-50"
       >
         {rodando ? 'Gerando…' : rotulo}
       </button>
