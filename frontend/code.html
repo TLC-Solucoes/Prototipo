@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_blank" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}.wa-chat-bg{background-color:#ece5dd;background-image:radial-gradient(#bec9c5 0.75px,transparent 0.75px),radial-gradient(#bec9c5 0.75px,#ece5dd 0.75px);background-size:24px 24px;background-position:0 0,12px 12px;opacity:0.98;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"on-secondary-fixed":"#00201c","background":"#fff8f1","on-error":"#ffffff","primary":"#00453d","surface-container-high":"#eee7df","surface-variant":"#e8e1d9","on-tertiary-fixed":"#002109","on-tertiary-fixed-variant":"#005322","inverse-on-surface":"#f7f0e7","on-surface":"#1e1b17","error":"#ba1a1a","secondary-container":"#8cf1e1","tertiary-fixed-dim":"#3de273","on-secondary":"#ffffff","on-primary-fixed":"#00201c","tertiary":"#00471c","primary-fixed":"#a8f0e3","error-container":"#ffdad6","outline-variant":"#bec9c5","surface-tint":"#1c695f","on-tertiary":"#ffffff","surface-container-low":"#faf2ea","surface-bright":"#fff8f1","surface-dim":"#e0d9d1","on-background":"#1e1b17","surface-container":"#f4ede5","secondary":"#006b5f","secondary-fixed-dim":"#72d8c8","inverse-surface":"#33302b","on-primary-container":"#8dd5c8","secondary-fixed":"#8ff4e3","surface":"#fff8f1","primary-container":"#075e54","tertiary-fixed":"#66ff8e","surface-container-highest":"#e8e1d9","on-tertiary-container":"#3fe374","on-surface-variant":"#3f4946","surface-container-lowest":"#ffffff","inverse-primary":"#8cd4c7","tertiary-container":"#006129","outline":"#6f7976","primary-fixed-dim":"#8cd4c7","on-primary-fixed-variant":"#005047","on-primary":"#ffffff","on-secondary-container":"#006f64","on-error-container":"#93000a","on-secondary-fixed-variant":"#005047"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"space-sm":"0.5rem","space-xl":"1.5rem","space-md":"0.75rem","space-lg":"1rem","margin":"1rem","gutter":"1rem","space-xs":"0.25rem"},"fontFamily":{"headline-sm":["Plus Jakarta Sans"],"headline-md":["Plus Jakarta Sans"],"headline-lg-mobile":["Plus Jakarta Sans"],"body-lg":["Plus Jakarta Sans"],"label-sm":["Plus Jakarta Sans"],"label-md":["Plus Jakarta Sans"],"label-lg":["Plus Jakarta Sans"],"body-md":["Plus Jakarta Sans"],"headline-lg":["Plus Jakarta Sans"],"body-sm":["Plus Jakarta Sans"]},"fontSize":{"headline-sm":["16px",{"lineHeight":"22px","fontWeight":"600"}],"headline-md":["19px",{"lineHeight":"26px","fontWeight":"600"}],"headline-lg-mobile":["22px",{"lineHeight":"28px","fontWeight":"700"}],"body-lg":["15px",{"lineHeight":"21px","fontWeight":"400"}],"label-sm":["11px",{"lineHeight":"14px","fontWeight":"400"}],"label-md":["12px",{"lineHeight":"16px","fontWeight":"500"}],"label-lg":["14px",{"lineHeight":"18px","fontWeight":"600"}],"body-md":["14.2px",{"lineHeight":"19.5px","fontWeight":"400"}],"headline-lg":["30px",{"lineHeight":"38px","fontWeight":"700"}],"body-sm":["13px",{"lineHeight":"18px","fontWeight":"400"}]}}}}</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><main class="w-full min-h-screen wa-chat-bg relative flex items-center justify-center"><div class="flex flex-col w-full items-center justify-center p-0 md:p-6 lg:p-8">
+<!-- Interactive Ambient Shell Container -->
+<div class="w-full max-w-[500px] h-[100dvh] md:h-[750px] flex flex-col bg-surface-container-high rounded-none md:rounded-2xl shadow-2xl overflow-hidden relative">
+<!-- Top Header (WhatsApp Business Style) -->
+<header class="bg-primary-container text-on-primary px-3.5 py-2.5 flex items-center justify-between shrink-0 shadow-sm z-20 select-none">
+<div class="flex items-center gap-2.5 min-w-0">
+<!-- Back navigation for mobile feel -->
+<button aria-label="Voltar" class="text-on-primary/80 hover:text-on-primary transition-colors flex items-center -ml-1 md:hidden" type="button">
+<span class="material-symbols-outlined text-[24px]">arrow_back</span>
+</button>
+<!-- Business Avatar with Status -->
+<div class="relative shrink-0 cursor-pointer">
+<img alt="Logo TLC Soluções" class="w-10 h-10 rounded-full object-cover bg-surface-container-lowest p-0.5 shadow-sm" src="https://lh3.googleusercontent.com/aida/AEtjO1VlrEssWte3M8tqR7tZgszf4TRcZ3EgsWszbdbt0u2KJWu40ViK2cvcvZcSNsjYoFBlsl6-3bxuui7ifG0CCnsg2834A6qM7eUgsI7StDKWz0F4YFA_4x9Gx7GqQZlnGnRkxebN4Saikbj7TJpq80315Orwb-_pspzvoHiII4A5CIKdKk0o0o0o692rydGw8TH2BtNI36xZJcj7xDWlYUj3fnTsvlh5h3DHTSSa0lGEQ-zUragtq8DuxrU"/>
+<span class="absolute bottom-0 right-0 w-3 h-3 bg-tertiary-fixed-dim rounded-full ring-2 ring-primary-container"></span>
+</div>
+<!-- Business Identity & Status -->
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1">
+<span class="font-headline-sm text-headline-sm text-on-primary truncate tracking-tight">TLC Soluções</span>
+<!-- WhatsApp Official Verified Badge -->
+<span class="inline-flex items-center justify-center text-tertiary-fixed-dim shrink-0 title='Conta Oficial Verificada'">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary-fixed truncate flex items-center gap-1" id="chat-header-status">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim inline-block animate-pulse"></span>
+            Conta comercial oficial • Online agora
+          </span>
+</div>
+</div>
+<!-- Header Action Icons -->
+<div class="flex items-center gap-3 text-on-primary/90">
+<button aria-label="Chamada de Vídeo" class="p-1 hover:text-on-primary hover:bg-primary/20 rounded-full transition-colors hidden sm:inline-flex" type="button">
+<span class="material-symbols-outlined text-[20px]">videocam</span>
+</button>
+<button aria-label="Chamada de Voz" class="p-1 hover:text-on-primary hover:bg-primary/20 rounded-full transition-colors hidden sm:inline-flex" type="button">
+<span class="material-symbols-outlined text-[19px]">call</span>
+</button>
+<button aria-label="Menu" class="p-1 hover:text-on-primary hover:bg-primary/20 rounded-full transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Chat Messages Scrollable Canvas with Classic Doodle Texture -->
+<div class="flex-1 overflow-y-auto px-3.5 py-4 space-y-3 wa-chat-bg relative scroll-smooth focus:outline-none" id="chat-feed" tabindex="0">
+<!-- End-to-End Encryption Security Card -->
+<div class="flex justify-center my-1.5">
+<div class="bg-surface-bright/95 shadow-sm rounded-lg px-3 py-1.5 max-w-[85%] text-center backdrop-blur-sm">
+<p class="font-label-sm text-label-sm text-on-surface-variant flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-[13px] text-outline">lock</span>
+            As mensagens são protegidas com a criptografia de ponta a ponta da 
+            <span class="font-medium text-primary">TLC Soluções</span>.
+          </p>
+</div>
+</div>
+<!-- Date Marker -->
+<div class="flex justify-center my-2">
+<span class="bg-surface-container-high/90 text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider px-2.5 py-1 rounded-md shadow-sm font-semibold">
+          Hoje
+        </span>
+</div>
+<!-- Incoming Message 1: Welcome & Value Proposition -->
+<div class="flex flex-col items-start max-w-[92%] sm:max-w-[82%] relative group animate-fade-in">
+<div class="bg-surface-container-lowest text-on-surface rounded-2xl rounded-tl-none p-3 shadow-sm relative">
+<!-- WhatsApp Speech Triangle Left -->
+<div class="absolute top-0 -left-2 w-0 h-0 border-t-[8px] border-t-surface-container-lowest border-l-[8px] border-l-transparent"></div>
+<div class="space-y-2">
+<p class="font-body-md text-body-md">
+              Olá! 👋 Seja muito bem-vindo à <strong class="text-primary font-semibold">TLC Soluções</strong>!
+            </p>
+<p class="font-body-md text-body-md text-on-surface-variant">
+              Somos especialistas em acelerar empresas com automação de ponta, consultoria corporativa e inteligência aplicada a negócios.
+            </p>
+<p class="font-body-md text-body-md font-medium text-on-surface">
+              Como podemos elevar os resultados da sua operação hoje?
+            </p>
+</div>
+<!-- Timestamp -->
+<div class="flex items-center justify-end gap-1 mt-1 text-outline">
+<span class="font-label-sm text-label-sm">10:42</span>
+</div>
+</div>
+<!-- Quick Reply Options (WhatsApp Interactive List Format) -->
+<div class="w-full mt-2 space-y-1.5">
+<button class="w-full text-left bg-surface-container-lowest hover:bg-surface-container-low transition-all duration-150 rounded-xl px-3.5 py-2.5 shadow-sm flex items-center justify-between group/btn cursor-pointer" onclick="triggerChoice('💼 Conhecer Soluções e Serviços')" type="button">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[18px] text-secondary">business_center</span>
+<span class="font-label-lg text-label-lg text-secondary group-hover/btn:text-primary transition-colors">Conhecer Soluções e Serviços</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline group-hover/btn:translate-x-0.5 transition-transform">chevron_right</span>
+</button>
+<button class="w-full text-left bg-surface-container-lowest hover:bg-surface-container-low transition-all duration-150 rounded-xl px-3.5 py-2.5 shadow-sm flex items-center justify-between group/btn cursor-pointer" onclick="triggerChoice('🚀 Falar com um Especialista')" type="button">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[18px] text-secondary">rocket_launch</span>
+<span class="font-label-lg text-label-lg text-secondary group-hover/btn:text-primary transition-colors">Falar com um Especialista</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline group-hover/btn:translate-x-0.5 transition-transform">chevron_right</span>
+</button>
+<button class="w-full text-left bg-surface-container-lowest hover:bg-surface-container-low transition-all duration-150 rounded-xl px-3.5 py-2.5 shadow-sm flex items-center justify-between group/btn cursor-pointer" onclick="triggerChoice('📊 Solicitar Orçamento')" type="button">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[18px] text-secondary">query_stats</span>
+<span class="font-label-lg text-label-lg text-secondary group-hover/btn:text-primary transition-colors">Solicitar Orçamento</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline group-hover/btn:translate-x-0.5 transition-transform">chevron_right</span>
+</button>
+<button class="w-full text-left bg-surface-container-lowest hover:bg-surface-container-low transition-all duration-150 rounded-xl px-3.5 py-2.5 shadow-sm flex items-center justify-between group/btn cursor-pointer" onclick="triggerChoice('❓ Dúvidas Frequentes')" type="button">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[18px] text-secondary">help_outline</span>
+<span class="font-label-lg text-label-lg text-secondary group-hover/btn:text-primary transition-colors">Dúvidas Frequentes</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline group-hover/btn:translate-x-0.5 transition-transform">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Outgoing Simulated User Message -->
+<div class="flex flex-col items-end w-full">
+<div class="bg-[#dcf8c6] text-on-surface rounded-2xl rounded-tr-none p-3 shadow-sm max-w-[85%] relative">
+<!-- WhatsApp Speech Triangle Right -->
+<div class="absolute top-0 -right-2 w-0 h-0 border-t-[8px] border-t-[#dcf8c6] border-r-[8px] border-r-transparent"></div>
+<p class="font-body-md text-body-md leading-snug">
+            Gostaria de conhecer as soluções para a minha empresa!
+          </p>
+<div class="flex items-center justify-end gap-1 mt-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant/70">10:43</span>
+<!-- Read Double-Check Status (WhatsApp Cyan) -->
+<span class="material-symbols-outlined text-[15px] text-[#53bdeb] -mr-0.5 font-bold" style="font-variation-settings: 'FILL' 1;">done_all</span>
+</div>
+</div>
+</div>
+<!-- Incoming Message 2: Solution Showcase with Action Hub -->
+<div class="flex flex-col items-start max-w-[92%] sm:max-w-[85%] relative">
+<div class="bg-surface-container-lowest text-on-surface rounded-2xl rounded-tl-none p-3 shadow-sm relative w-full">
+<div class="absolute top-0 -left-2 w-0 h-0 border-t-[8px] border-t-surface-container-lowest border-l-[8px] border-l-transparent"></div>
+<div class="space-y-2">
+<p class="font-body-md text-body-md font-semibold text-primary">
+              Excelente escolha! Conheça nossas verticais principais:
+            </p>
+<!-- Feature Card 1 -->
+<div class="bg-surface-container-low/70 rounded-xl p-2.5 flex items-start gap-2.5">
+<div class="bg-primary-fixed text-on-primary-fixed p-1.5 rounded-lg shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[18px]">smart_toy</span>
+</div>
+<div class="min-w-0">
+<h4 class="font-label-lg text-label-lg text-on-surface font-semibold leading-tight">Automação &amp; Chatbots IA</h4>
+<p class="font-label-md text-label-md text-on-surface-variant mt-0.5">Atendimento 24/7 humanizado e integrado aos seus canais de vendas.</p>
+</div>
+</div>
+<!-- Feature Card 2 -->
+<div class="bg-surface-container-low/70 rounded-xl p-2.5 flex items-start gap-2.5">
+<div class="bg-secondary-container text-on-secondary-container p-1.5 rounded-lg shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[18px]">hub</span>
+</div>
+<div class="min-w-0">
+<h4 class="font-label-lg text-label-lg text-on-surface font-semibold leading-tight">Integração &amp; CRM</h4>
+<p class="font-label-md text-label-md text-on-surface-variant mt-0.5">Funil sincronizado, métricas em tempo real e automação de fluxos.</p>
+</div>
+</div>
+<!-- Feature Card 3 -->
+<div class="bg-surface-container-low/70 rounded-xl p-2.5 flex items-start gap-2.5">
+<div class="bg-tertiary-fixed text-on-tertiary-fixed p-1.5 rounded-lg shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[18px]">code</span>
+</div>
+<div class="min-w-0">
+<h4 class="font-label-lg text-label-lg text-on-surface font-semibold leading-tight">Desenvolvimento Sob Medida</h4>
+<p class="font-label-md text-label-md text-on-surface-variant mt-0.5">Soluções digitais customizadas para a escala da sua empresa.</p>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface font-medium pt-1">
+              Deseja conversar agora com nosso consultor no canal direto?
+            </p>
+</div>
+<div class="flex items-center justify-end gap-1 mt-1 text-outline">
+<span class="font-label-sm text-label-sm">10:43</span>
+</div>
+</div>
+<!-- High-Impact Direct Conversion Triggers -->
+<div class="w-full mt-2 flex flex-col sm:flex-row gap-2">
+<a class="flex-1 bg-tertiary hover:bg-tertiary-container text-on-tertiary px-3.5 py-2.5 rounded-xl font-label-lg text-label-lg shadow-sm flex items-center justify-center gap-2 transition-transform active:scale-[0.98]" href="https://wa.me/?text=Ol%C3%A1%2C%20gostaria%20de%20falar%20com%20a%20equipe%20da%20TLC%20Solu%C3%A7%C3%B5es" rel="noopener noreferrer" target="_blank">
+<span class="material-symbols-outlined text-[18px]">chat</span>
+<span>Chamar no WhatsApp Real</span>
+</a>
+<button class="flex-1 bg-surface-container-lowest hover:bg-surface-container-low text-secondary px-3.5 py-2.5 rounded-xl font-label-lg text-label-lg shadow-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer" onclick="triggerChoice('🗓️ Agendar Demonstração')" type="button">
+<span class="material-symbols-outlined text-[18px]">calendar_month</span>
+<span>Agendar Demo</span>
+</button>
+</div>
+</div>
+<!-- Dynamic Message Insert Anchor -->
+<div class="space-y-2.5" id="dynamic-zone"></div>
+</div>
+<!-- Interactive Chat Input Dock -->
+<footer class="bg-surface-container-high px-2.5 py-2 flex items-center gap-2 shrink-0 border-t-0 shadow-inner z-20">
+<!-- Media triggers -->
+<div class="flex items-center text-outline">
+<button aria-label="Inserir Emoji" class="p-1.5 hover:text-on-surface transition-colors rounded-full" type="button">
+<span class="material-symbols-outlined text-[24px]">mood</span>
+</button>
+<button aria-label="Anexar Arquivo" class="p-1.5 hover:text-on-surface transition-colors rounded-full -ml-1" type="button">
+<span class="material-symbols-outlined text-[24px]">attach_file</span>
+</button>
+</div>
+<!-- Text Input Form -->
+<form class="flex-1 flex items-center" id="chat-form" onsubmit="handleChatSubmit(event)">
+<div class="relative w-full flex items-center">
+<input autocomplete="off" class="w-full bg-surface-container-lowest text-on-surface placeholder:text-outline font-body-md text-body-md rounded-full py-2.5 pl-4 pr-10 focus:outline-none shadow-sm" id="chat-input" placeholder="Digite uma mensagem..." type="text"/>
+<button aria-label="Câmera" class="absolute right-3 text-outline hover:text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">photo_camera</span>
+</button>
+</div>
+</form>
+<!-- Primary Action Dispatch Button -->
+<button aria-label="Enviar mensagem" class="w-10 h-10 rounded-full bg-secondary hover:bg-primary text-on-secondary flex items-center justify-center shadow-md transition-all active:scale-95 shrink-0" id="send-btn" onclick="handleChatSubmit(event)" type="button">
+<span class="material-symbols-outlined text-[20px]" id="send-icon">send</span>
+</button>
+</footer>
+</div>
+<!-- Trust Guarantee Subtitle / Footer Meta -->
+<div class="text-center mt-3 px-4 hidden md:block">
+<p class="font-label-sm text-label-sm text-outline-variant tracking-wide font-medium">
+      TLC Soluções • Tecnologia que Conecta e Transforma • Atendimento 24/7
+    </p>
+</div>
+</div>
+<script>
+  function getCurrentTime() {
+    const now = new Date();
+    return now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+  }
+
+  function scrollToBottom() {
+    const feed = document.getElementById('chat-feed');
+    if (feed) {
+      setTimeout(() => {
+        feed.scrollTop = feed.scrollHeight;
+      }, 50);
+    }
+  }
+
+  function appendUserBubble(text) {
+    const zone = document.getElementById('dynamic-zone');
+    const time = getCurrentTime();
+    
+    const wrapper = document.createElement('div');
+    wrapper.className = 'flex flex-col items-end w-full';
+    wrapper.innerHTML = `
+      <div class="bg-[#dcf8c6] text-on-surface rounded-2xl rounded-tr-none p-3 shadow-sm max-w-[85%] relative animate-fade-in">
+        <div class="absolute top-0 -right-2 w-0 h-0 border-t-[8px] border-t-[#dcf8c6] border-r-[8px] border-r-transparent"></div>
+        <p class="font-body-md text-body-md leading-snug">${escapeHtml(text)}</p>
+        <div class="flex items-center justify-end gap-1 mt-1">
+          <span class="font-label-sm text-label-sm text-on-surface-variant/70">${time}</span>
+          <span class="material-symbols-outlined text-[15px] text-[#53bdeb] -mr-0.5 font-bold" style="font-variation-settings: 'FILL' 1;">done_all</span>
+        </div>
+      </div>
+    `;
+    zone.appendChild(wrapper);
+    scrollToBottom();
+  }
+
+  function appendBotBubble(contentHtml) {
+    const zone = document.getElementById('dynamic-zone');
+    const time = getCurrentTime();
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'flex flex-col items-start max-w-[92%] sm:max-w-[82%] relative';
+    wrapper.innerHTML = `
+      <div class="bg-surface-container-lowest text-on-surface rounded-2xl rounded-tl-none p-3 shadow-sm relative w-full">
+        <div class="absolute top-0 -left-2 w-0 h-0 border-t-[8px] border-t-surface-container-lowest border-l-[8px] border-l-transparent"></div>
+        <div class="font-body-md text-body-md space-y-1.5">${contentHtml}</div>
+        <div class="flex items-center justify-end gap-1 mt-1 text-outline">
+          <span class="font-label-sm text-label-sm">${time}</span>
+        </div>
+      </div>
+    `;
+    zone.appendChild(wrapper);
+    scrollToBottom();
+  }
+
+  function showBotTyping() {
+    const statusEl = document.getElementById('chat-header-status');
+    if (statusEl) {
+      statusEl.innerHTML = '<span class="font-label-sm text-label-sm text-tertiary-fixed font-semibold italic animate-pulse">digitando...</span>';
+    }
+  }
+
+  function resetBotStatus() {
+    const statusEl = document.getElementById('chat-header-status');
+    if (statusEl) {
+      statusEl.innerHTML = `
+        <span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim inline-block animate-pulse"></span>
+        Conta comercial oficial • Online agora
+      `;
+    }
+  }
+
+  function simulateBotReply(userText) {
+    showBotTyping();
+    setTimeout(() => {
+      resetBotStatus();
+      let responseHtml = "";
+      const lower = userText.toLowerCase();
+
+      if (lower.includes('orçamento') || lower.includes('preço') || lower.includes('custo')) {
+        responseHtml = `
+          Perfeito! Para personalizarmos seu orçamento com agilidade, qual o tamanho médio da sua equipe atual?
+          <div class="pt-2 flex flex-wrap gap-1.5">
+            <button onclick="triggerChoice('1 a 10 colaboradores')" class="bg-surface-container-high px-2.5 py-1 rounded-md text-label-sm font-label-sm text-secondary hover:bg-secondary-container">1 a 10 pessoas</button>
+            <button onclick="triggerChoice('11 a 50 colaboradores')" class="bg-surface-container-high px-2.5 py-1 rounded-md text-label-sm font-label-sm text-secondary hover:bg-secondary-container">11 a 50 pessoas</button>
+            <button onclick="triggerChoice('Mais de 50 colaboradores')" class="bg-surface-container-high px-2.5 py-1 rounded-md text-label-sm font-label-sm text-secondary hover:bg-secondary-container">+50 pessoas</button>
+          </div>
+        `;
+      } else if (lower.includes('especialista') || lower.includes('falar')) {
+        responseHtml = `
+          Excelente! Nossos consultores sêniores estão prontos. 
+          <a href="https://wa.me/?text=Quero%20falar%20com%20um%20consultor%20da%20TLC" class="text-secondary font-semibold underline block mt-1">
+            Clique aqui para abrir atendimento prioritário imediato ➔
+          </a>
+        `;
+      } else if (lower.includes('demonstração') || lower.includes('demo')) {
+        responseHtml = `
+          Agendamento reservado! Nossa equipe demonstrará nossas ferramentas de IA e CRM em tempo real adaptadas à sua empresa. Enviaremos o convite corporativo.
+        `;
+      } else {
+        responseHtml = `
+          Compreendido! Um especialista da <strong>TLC Soluções</strong> já recebeu a sua solicitação e entrará em contato em instantes. Deseja complementar mais algum detalhe?
+        `;
+      }
+
+      appendBotBubble(responseHtml);
+    }, 1100);
+  }
+
+  function triggerChoice(text) {
+    appendUserBubble(text);
+    simulateBotReply(text);
+  }
+
+  function handleChatSubmit(e) {
+    if (e) e.preventDefault();
+    const input = document.getElementById('chat-input');
+    if (!input) return;
+    const value = input.value.trim();
+    if (value.length === 0) return;
+
+    appendUserBubble(value);
+    input.value = '';
+    simulateBotReply(value);
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/[&<>'"]/g, 
+      tag => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+      }[tag] || tag)
+    );
+  }
+
+  // Smooth dynamic input listener
+  document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('chat-input');
+    const sendIcon = document.getElementById('send-icon');
+    if (input && sendIcon) {
+      input.addEventListener('input', () => {
+        if (input.value.trim().length > 0) {
+          sendIcon.textContent = 'send';
+        } else {
+          sendIcon.textContent = 'mic';
+        }
+      });
+      // Initial state icon
+      sendIcon.textContent = 'send';
+    }
+  });
+</script></main></body></html>
