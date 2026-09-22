@@ -1,6 +1,18 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", sans-serif;
+}
+
 html,
 body {
   height: 100%;
+}
+
+.fundo-conversa {
+  background-color: #efeae2;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Cg fill='none' stroke='%234A3F35' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' opacity='.07'%3E%3Cpath d='M20 34 52 20 40 48 34 38Z'/%3E%3Cpath d='M20 34 34 38'/%3E%3Cpath d='M120 22l3.2 7.4 8 .7-6.1 5.3 1.8 7.8-6.9-4.2-6.9 4.2 1.8-7.8-6.1-5.3 8-.7Z'/%3E%3Cpath d='M176 26h24a4 4 0 0 1 4 4v14a4 4 0 0 1-4 4h-24a4 4 0 0 1-4-4V30a4 4 0 0 1 4-4z'/%3E%3Ccircle cx='188' cy='37' r='6'/%3E%3Cpath d='M52 116c-9-6.6-15-11.8-15-18a7.6 7.6 0 0 1 15-4.2 7.6 7.6 0 0 1 15 4.2c0 6.2-6 11.4-15 18z'/%3E%3Ccircle cx='172' cy='108' r='13'/%3E%3Cpath d='M167 104v1.6M177 104v1.6'/%3E%3Cpath d='M165.5 112a8 8 0 0 0 13 0'/%3E%3Cpath d='M84 144h22a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5h-12l-7 6v-6h-3a5 5 0 0 1-5-5v-10a5 5 0 0 1 5-5z'/%3E%3Cpath d='M196 130c4-6 8 6 12 0s8-6 12 0'/%3E%3Cpath d='M44 196v-22l18-4v22'/%3E%3Ccircle cx='40' cy='196.5' r='4.5'/%3E%3Ccircle cx='58' cy='192.5' r='4.5'/%3E%3Cpath d='M140 186h20v12a8 8 0 0 1-8 8h-4a8 8 0 0 1-8-8z'/%3E%3Cpath d='M160 189h3a5 5 0 0 1 0 10h-3'/%3E%3Cpath d='M146 180c0-3 3-3 3-6M154 180c0-3 3-3 3-6'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 240px 240px;
+  background-repeat: repeat;
 }
