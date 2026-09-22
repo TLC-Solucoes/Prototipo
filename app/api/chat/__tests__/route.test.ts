@@ -118,7 +118,14 @@ describe('POST /api/chat quando o modelo falha', () => {
     appendMessage.mockRejectedValueOnce(new Error('banco fora do ar'))
     const { POST } = await import('@/app/api/chat/route')
     const resposta = await POST(requisicao('tenho uma loja'))
-    expect(await resposta.text()).toContain('tenta de novo')
+    expect(await resposta.text()).toContain('não consegui registrar')
+  })
+
+  it('não promete ter guardado a mensagem quando foi o banco que falhou', async () => {
+    appendMessage.mockRejectedValueOnce(new Error('banco fora do ar'))
+    const { POST } = await import('@/app/api/chat/route')
+    const resposta = await POST(requisicao('tenho uma loja'))
+    expect(await resposta.text()).not.toContain('guardada')
   })
 
   it('o modelo recebe a abertura como contexto já na primeira mensagem do visitante', async () => {

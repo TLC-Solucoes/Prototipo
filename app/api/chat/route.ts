@@ -30,6 +30,9 @@ export const runtime = 'nodejs'
 const FALHA_DO_MODELO =
   'Não consegui responder agora. Sua mensagem foi guardada — tenta de novo em instantes.'
 
+const FALHA_NO_BANCO =
+  'Tive um problema aqui e não consegui registrar o que você escreveu. Manda de novo daqui a pouco, por favor.'
+
 const deps = { countRecentConversations, countUserMessages }
 
 function texto(corpo: string, cookie: string | null): Response {
@@ -86,7 +89,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     historico = await listMessages(conversationId)
   } catch (erro) {
     console.error('chat: falha no banco antes do stream', erro)
-    return texto(FALHA_DO_MODELO, cookie)
+    return texto(FALHA_NO_BANCO, cookie)
   }
 
   const id = conversationId
