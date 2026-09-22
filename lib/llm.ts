@@ -1,4 +1,3 @@
-import OpenAI from 'openai'
 import type { ChatMessage } from '@/lib/prompt'
 
 function obrigatoria(nome: string): string {
@@ -7,47 +6,87 @@ function obrigatoria(nome: string): string {
   return valor
 }
 
-function client(): OpenAI {
-  return new OpenAI({
-    baseURL: obrigatoria('OPENAI_BASE_URL'),
-    apiKey: process.env.OPENAI_API_KEY || 'sem-chave',
-  })
+function isDone(linha: string): boolean {
+  return linha.startsWith('data:') && linha.slice(5).trim() === '[DONE]'
 }
 
-function chatModel(): string {
-  return obrigatoria('MODEL_NAME')
-}
-
-export function extractModel(): string {
-  return process.env.MODEL_NAME_EXTRACT || chatModel()
+function deltaOf(linha: string): string | null {
+  if (!linha.startsWith('data:')) return null
+  const payload = linha.slice(5).trim()
+  if (!payload) return null
+  try {
+    const chunk = JSON.parse(payload) as {
+      choices?: { delta?: { content?: string | null } }[]
+    }
+    const texto = chunk.choices?.[0]?.delta?.content
+    return typeof texto === 'string' && texto !== '' ? texto : null
+  } catch {
+    return null
+  }
 }
 
 export async function* streamChat(
   messages: ChatMessage[],
 ): AsyncGenerator<string> {
-  const stream = await client().chat.completions.create({
-    model: chatModel(),
-    messages,
-    stream: true,
-    temperature: 0.7,
-    max_tokens: 400,
+  const atual = messages[messages.length - 1]
+  if (!atual || atual.content.trim() === '') {
+    throw new Error('streamChat: a última mensagem não pode ser vazia')
+  }
+
+  const url = obrigatoria('AGENT_CHAT_URL')
+  const apiKey = obrigatoria('AGENT_API_KEY')
+
+  const resposta = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'text/event-stream',
+      'x-api-key': apiKey,
+    },
+    body: JSON.stringify({
+      message: atual.content,
+      history: messages.slice(0, -1).map(({ role, content }) => ({ role, content })),
+    }),
   })
 
-  for await (const part of stream) {
-    const delta = part.choices[0]?.delta?.content
-    if (delta) yield delta
+  if (!resposta.ok) {
+    const detalhe = await resposta.text().catch(() => '')
+    throw new Error(
+      `Agente respondeu ${resposta.status}${detalhe ? `: ${detalhe.slice(0, 300)}` : ''}`,
+    )
+  }
+  if (!resposta.body) throw new Error('Agente respondeu sem corpo legível')
+
+  const reader = resposta.body.getReader()
+  const decoder = new TextDecoder()
+  let pendente = ''
+
+  try {
+    for (;;) {
+      const { done, value } = await reader.read()
+      const bloco = done
+        ? decoder.decode()
+        : decoder.decode(value, { stream: true })
+      pendente += bloco
+
+      const linhas = pendente.split('\n')
+      pendente = done ? '' : (linhas.pop() ?? '')
+
+      for (const linha of linhas) {
+        if (isDone(linha)) return
+        const texto = deltaOf(linha)
+        if (texto) yield texto
+      }
+
+      if (done) return
+    }
+  } finally {
+    await reader.cancel().catch(() => {})
   }
 }
 
-export async function complete(
-  messages: ChatMessage[],
-  model = extractModel(),
-): Promise<string> {
-  const resposta = await client().chat.completions.create({
-    model,
-    messages,
-    temperature: 0,
-    max_tokens: 800,
-  })
-  return resposta.choices[0]?.message?.content ?? ''
+export async function complete(messages: ChatMessage[]): Promise<string> {
+  let texto = ''
+  for await (const pedaco of streamChat(messages)) texto += pedaco
+  return texto
 }
