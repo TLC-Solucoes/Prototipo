@@ -2,6 +2,7 @@ import { carregarSystemPrompt } from '@/lib/prompt'
 import { proposePrompt } from '@/lib/prompt-proposal'
 
 export const runtime = 'nodejs'
+export const maxDuration = 60
 
 export async function POST(req: Request): Promise<Response> {
   const corpo = (await req.json().catch(() => null)) as { pedido?: string } | null
