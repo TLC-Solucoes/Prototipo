@@ -5,7 +5,7 @@ export type ChatMessage = {
   content: string
 }
 
-const SYSTEM = `Você é consultor da TLC Soluções, uma empresa que constrói microsoluções de automação para negócios pequenos: clínicas, lojas, e-commerce, concessionárias, escolas, pequenas indústrias e escritórios.
+export const SYSTEM_PADRAO = `Você é consultor da TLC Soluções, uma empresa que constrói microsoluções de automação para negócios pequenos: clínicas, lojas, e-commerce, concessionárias, escolas, pequenas indústrias e escritórios.
 
 Seu trabalho nesta conversa é um só: descobrir qual tarefa repetitiva dói no negócio de quem está falando com você, e terminar com o contato dessa pessoa. Você não vende, não orça e não fecha nada.
 
@@ -51,14 +51,20 @@ COMO ENCERRAR
 Depois que tiver o contato, confirme em uma frase o que você entendeu, diga que o time volta com uma proposta, e pare. Não fique puxando conversa nem oferecendo mais nada.`
 
 export function buildSystemPrompt(): string {
-  return SYSTEM
+  return SYSTEM_PADRAO
+}
+
+export async function carregarSystemPrompt(): Promise<string> {
+  const { latestPromptVersion } = await import('@/lib/db')
+  return (await latestPromptVersion()) ?? SYSTEM_PADRAO
 }
 
 export function buildChatMessages(
   history: Pick<Message, 'role' | 'content'>[],
+  system: string = SYSTEM_PADRAO,
 ): ChatMessage[] {
   return [
-    { role: 'system', content: buildSystemPrompt() },
+    { role: 'system', content: system },
     ...history.map((m) => ({ role: m.role, content: m.content })),
   ]
 }

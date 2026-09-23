@@ -28,6 +28,13 @@ export default async function Painel() {
             Conversas
           </h1>
         </div>
+        <div className="flex items-end gap-8">
+        <Link
+          href="/admin/prompt"
+          className="text-[14px] font-semibold text-[#E08C55]"
+        >
+          Prompt
+        </Link>
         <dl className="flex gap-8">
           <div className="flex flex-col items-end gap-0.5">
             <dd className="font-[family-name:var(--font-display)] text-[27px] font-semibold">
@@ -48,6 +55,7 @@ export default async function Painel() {
             <dt className="text-[12px] text-[#A19A8E]">sem resumo</dt>
           </div>
         </dl>
+        </div>
       </header>
 
       <ul className="mt-2">

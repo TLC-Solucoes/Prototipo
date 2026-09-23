@@ -11,7 +11,7 @@ import {
 } from '@/lib/db'
 import { hashIp } from '@/lib/hash'
 import { streamChat } from '@/lib/llm'
-import { buildChatMessages } from '@/lib/prompt'
+import { buildChatMessages, carregarSystemPrompt } from '@/lib/prompt'
 import {
   chatPausado,
   checkMessage,
@@ -64,6 +64,7 @@ export async function POST(req: NextRequest): Promise<Response> {
   let conversationId: string | null = null
   let cookie: string | null = null
   let historico: Awaited<ReturnType<typeof listMessages>>
+  let system: string
 
   try {
     const ipHash = hashIp(clientIp(req))
@@ -101,6 +102,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     if (!gravou) return texto(RECUSA_MENSAGENS, cookie)
 
     historico = await listMessages(conversationId)
+    system = await carregarSystemPrompt()
   } catch (erro) {
     console.error('chat: falha antes do stream', erro)
     return texto(FALHA_NO_BANCO, cookie)
@@ -113,7 +115,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       let completo = ''
       let incompleta = false
       try {
-        for await (const pedaco of streamChat(buildChatMessages(historico))) {
+        for await (const pedaco of streamChat(buildChatMessages(historico, system))) {
           completo += pedaco
           controller.enqueue(encoder.encode(pedaco))
         }

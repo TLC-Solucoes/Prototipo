@@ -57,3 +57,13 @@ export type AdminRow = {
 export type ConversationSlot =
   | { id: string }
   | { id: null; motivo: 'ip' | 'global' }
+
+export type PromptOrigem = 'manual' | 'ia'
+
+export type PromptVersion = {
+  id: number
+  conteudo: string
+  criadoEm: Date
+  origem: PromptOrigem
+  pedido: string | null
+}

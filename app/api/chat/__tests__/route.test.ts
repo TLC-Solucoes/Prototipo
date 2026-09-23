@@ -18,6 +18,7 @@ vi.mock('@/lib/db', () => ({
   createConversationWithinLimit: (...args: unknown[]) =>
     createConversationWithinLimit(...args),
   getConversation: (...args: unknown[]) => getConversation(...args),
+  latestPromptVersion: async () => null,
   listMessages: (...args: unknown[]) => listMessages(...args),
 }))
 

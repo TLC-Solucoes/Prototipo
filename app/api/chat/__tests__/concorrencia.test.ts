@@ -36,6 +36,7 @@ vi.mock('@/lib/db', () => ({
     return { id }
   },
   getConversation: async (id: string) => (id ? { id } : null),
+  latestPromptVersion: async () => null,
   listMessages: async () => [
     { id: 1, role: 'user', content: 'oi', incomplete: false, createdAt: new Date() },
   ],
