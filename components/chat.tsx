@@ -119,106 +119,154 @@ export function Chat() {
     }
   }
 
+  const acoesRapidas = [
+    { label: 'Conhecer Soluções e Serviços', icon: 'business_center' },
+    { label: 'Falar com um Especialista', icon: 'rocket_launch' },
+    { label: 'Solicitar Orçamento', icon: 'trending_up' },
+    { label: 'Dúvidas Frequentes', icon: 'help_outline' },
+  ]
+
+  const enviarAcaoRapida = (label: string) => {
+    if (enviando) return
+    const hora = formatarHora()
+    setEnviando(true)
+    setMensagens((atuais) => [
+      ...atuais,
+      { role: 'user', content: label, timestamp: hora },
+      { role: 'assistant', content: '', timestamp: hora },
+    ])
+
+    let acumulado = ''
+    fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: label }),
+    })
+      .then(async (resposta) => {
+        if (!resposta.ok || !resposta.body) {
+          trocarUltima(FALHA)
+          return
+        }
+        const leitor = resposta.body.getReader()
+        const decodificador = new TextDecoder()
+        for (;;) {
+          const { done, value } = await leitor.read()
+          if (done) break
+          acumulado += decodificador.decode(value, { stream: true })
+          trocarUltima(acumulado)
+        }
+      })
+      .catch(() => trocarUltima(FALHA))
+      .finally(() => {
+        setEnviando(false)
+        agendarResumo()
+      })
+  }
+
   return (
-    <main className="relative flex min-h-screen w-full items-center justify-center wa-chat-bg font-sans antialiased">
-      <div className="flex w-full flex-col items-center justify-center p-0 md:p-6 lg:p-8">
-        <div className="relative flex h-[100dvh] w-full max-w-[500px] flex-col overflow-hidden bg-surface-container-high shadow-2xl rounded-none md:h-[750px] md:max-h-[calc(100dvh-3rem)] md:rounded-2xl">
+    <main className="relative flex min-h-screen w-full items-center justify-center bg-[#E8ECE9] font-sans antialiased p-0 md:p-6 lg:p-8">
+      <div className="flex w-full flex-col items-center justify-center">
+        <div className="relative flex h-[100dvh] w-full max-w-[480px] flex-col overflow-hidden bg-[#F2F4F3] shadow-2xl rounded-none md:h-[760px] md:max-h-[calc(100dvh-2rem)] md:rounded-3xl border border-black/10">
+
           {/* Header Bar */}
-          <header className="z-20 flex shrink-0 select-none items-center justify-between bg-primary-container px-3.5 py-2.5 text-on-primary shadow-sm">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <button
-                type="button"
-                aria-label="Voltar"
-                className="flex items-center -ml-1 text-on-primary/80 transition-colors hover:text-on-primary md:hidden"
-              >
-                <span className="material-symbols-outlined text-[24px]">arrow_back</span>
-              </button>
-              <div className="relative shrink-0 cursor-pointer">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-lowest text-primary font-bold text-sm shadow-sm ring-1 ring-white/20">
-                  TLC
+          <header className="z-20 flex shrink-0 select-none items-center justify-between bg-[#081F26] px-4 py-3 text-white shadow-md">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="relative shrink-0">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0E353F] text-emerald-300 font-bold text-xs ring-1 ring-emerald-500/30">
+                  <span className="material-symbols-outlined text-[22px] text-[#00E5C0]">chat</span>
                 </div>
-                <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-tertiary-fixed-dim ring-2 ring-primary-container"></span>
+                <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-[#00E5C0] ring-2 ring-[#081F26]"></span>
               </div>
               <div className="flex flex-col min-w-0">
-                <div className="flex items-center gap-1">
-                  <span className="truncate font-semibold text-[16px] text-on-primary tracking-tight">TLC Soluções</span>
-                  <span className="inline-flex shrink-0 items-center justify-center text-tertiary-fixed-dim" title="Conta Oficial Verificada">
-                    <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
-                  </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="truncate font-semibold text-[15px] text-white tracking-tight">TLC Soluções</span>
+                  <span className="material-symbols-outlined text-[16px] text-[#00E5C0]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                 </div>
-                <span className="flex items-center gap-1 truncate text-[11px] text-primary-fixed">
+                <span className="flex items-center gap-1.5 truncate text-[11px] text-slate-300">
                   {enviando ? (
-                    <span className="font-semibold italic text-tertiary-fixed animate-pulse">digitando...</span>
+                    <span className="font-semibold italic text-[#00E5C0] animate-pulse">digitando...</span>
                   ) : (
                     <>
-                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-tertiary-fixed-dim animate-pulse"></span>
-                      Conta comercial oficial • Online agora
+                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#00E5C0]"></span>
+                      IA Corporativa • Online
                     </>
                   )}
                 </span>
               </div>
             </div>
-            <div className="flex items-center gap-3 text-on-primary/90">
-              <button type="button" aria-label="Chamada de Vídeo" className="hidden sm:inline-flex rounded-full p-1 transition-colors hover:bg-primary/20 hover:text-on-primary">
-                <span className="material-symbols-outlined text-[20px]">videocam</span>
+            <div className="flex items-center gap-3 text-slate-300">
+              <button type="button" aria-label="Recarregar" className="rounded-full p-1 transition-colors hover:text-white hover:bg-white/10">
+                <span className="material-symbols-outlined text-[20px]">refresh</span>
               </button>
-              <button type="button" aria-label="Chamada de Voz" className="hidden sm:inline-flex rounded-full p-1 transition-colors hover:bg-primary/20 hover:text-on-primary">
-                <span className="material-symbols-outlined text-[19px]">call</span>
-              </button>
-              <button type="button" aria-label="Menu" className="rounded-full p-1 transition-colors hover:bg-primary/20 hover:text-on-primary">
-                <span className="material-symbols-outlined text-[20px]">more_vert</span>
+              <button type="button" aria-label="Informações" className="rounded-full p-1 transition-colors hover:text-white hover:bg-white/10">
+                <span className="material-symbols-outlined text-[20px]">info</span>
               </button>
             </div>
           </header>
 
-          {/* Chat Canvas Feed */}
-          <div className="relative flex-1 overflow-y-auto px-3.5 py-4 space-y-3 wa-chat-bg scroll-smooth focus:outline-none" tabIndex={0}>
-            {/* Encryption notice */}
-            <div className="my-1.5 flex justify-center">
-              <div className="max-w-[85%] rounded-lg bg-surface-bright/95 px-3 py-1.5 text-center shadow-sm backdrop-blur-sm">
-                <p className="flex items-center justify-center gap-1 text-[11px] text-on-surface-variant">
-                  <span className="material-symbols-outlined text-[13px] text-outline">lock</span>
-                  As mensagens são protegidas com a criptografia de ponta a ponta da{' '}
-                  <span className="font-medium text-primary">TLC Soluções</span>.
-                </p>
-              </div>
-            </div>
+          {/* Encryption Badge Banner */}
+          <div className="z-10 bg-[#0E2830] px-4 py-1.5 text-center shadow-inner">
+            <p className="flex items-center justify-center gap-1.5 text-[11px] font-medium text-slate-300">
+              <span className="material-symbols-outlined text-[13px] text-[#00E5C0]">verified_user</span>
+              Ambiente seguro <span className="text-[#00E5C0] font-semibold">TLC Soluções</span> • Criptografia e Proteção de Dados
+            </p>
+          </div>
 
+          {/* Chat Canvas Feed */}
+          <div className="relative flex-1 overflow-y-auto px-4 py-4 space-y-3.5 bg-[#F2F4F3] scroll-smooth focus:outline-none" tabIndex={0}>
             {/* Date marker */}
-            <div className="my-2 flex justify-center">
-              <span className="rounded-md bg-surface-container-high/90 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant shadow-sm">
-                Hoje
+            <div className="my-1 flex justify-center">
+              <span className="rounded-md bg-[#E1E6E3] px-3 py-0.5 text-[11px] font-semibold tracking-wider text-slate-600">
+                HOJE
               </span>
             </div>
 
             {/* Message Feed */}
             {mensagens.map((mensagem, indice) =>
               mensagem.role === 'assistant' ? (
-                <div key={indice} className="relative flex max-w-[92%] sm:max-w-[82%] flex-col items-start my-1.5">
-                  <div className="relative w-full rounded-2xl rounded-tl-none bg-surface-container-lowest p-3 text-on-surface shadow-sm">
-                    <div className="absolute top-0 -left-2 h-0 w-0 border-t-[8px] border-t-surface-container-lowest border-l-[8px] border-l-transparent"></div>
+                <div key={indice} className="relative flex max-w-[90%] flex-col items-start my-1">
+                  <div className="relative w-full rounded-2xl bg-white p-3.5 text-slate-800 shadow-sm border border-slate-200/60">
                     <div
-                      className="text-[14.2px] leading-[19.5px] whitespace-pre-wrap"
+                      className="text-[14px] leading-[20px] whitespace-pre-wrap font-normal"
                       aria-live={indice === mensagens.length - 1 ? 'polite' : undefined}
                     >
                       {mensagem.content}
                       {enviando && indice === mensagens.length - 1 && !mensagem.content ? (
-                        <span className="ml-1.5 inline-block size-2 rounded-full bg-secondary animate-pulse" aria-hidden="true" />
+                        <span className="ml-1.5 inline-block size-2 rounded-full bg-[#081F26] animate-pulse" aria-hidden="true" />
                       ) : null}
                     </div>
-                    <div className="mt-1 flex items-center justify-end gap-1 text-outline">
+                    <div className="mt-1 flex items-center justify-end text-slate-400">
                       <span className="text-[11px]">{mensagem.timestamp || horaAtual}</span>
                     </div>
                   </div>
+
+                  {/* Quick Action Chips directly after first assistant message */}
+                  {indice === 0 && (
+                    <div className="mt-2.5 flex w-full flex-col gap-2">
+                      {acoesRapidas.map((acao, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => enviarAcaoRapida(acao.label)}
+                          className="flex items-center justify-between w-full rounded-xl bg-white px-3.5 py-2.5 text-left text-[13.5px] font-medium text-slate-700 shadow-sm border border-slate-200/80 transition-all hover:bg-slate-50 hover:border-emerald-500/40 active:scale-[0.99]"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <span className="material-symbols-outlined text-[18px] text-[#081F26]">{acao.icon}</span>
+                            <span>{acao.label}</span>
+                          </div>
+                          <span className="material-symbols-outlined text-[16px] text-slate-400">chevron_right</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ) : (
-                <div key={indice} className="flex w-full flex-col items-end my-1.5">
-                  <div className="relative max-w-[85%] rounded-2xl rounded-tr-none bg-[#DCF8C6] p-3 text-on-surface shadow-sm">
-                    <div className="absolute top-0 -right-2 h-0 w-0 border-t-[8px] border-t-[#DCF8C6] border-r-[8px] border-r-transparent"></div>
-                    <p className="text-[14.2px] leading-[19.5px] whitespace-pre-wrap">{mensagem.content}</p>
+                <div key={indice} className="flex w-full flex-col items-end my-1">
+                  <div className="relative max-w-[85%] rounded-2xl bg-[#D0F8F3] p-3.5 text-slate-800 shadow-sm border border-[#A7F0E7]/60">
+                    <p className="text-[14px] leading-[20px] whitespace-pre-wrap">{mensagem.content}</p>
                     <div className="mt-1 flex items-center justify-end gap-1">
-                      <span className="text-[11px] text-on-surface-variant/70">{mensagem.timestamp || horaAtual}</span>
-                      <span className="material-symbols-outlined text-[15px] text-[#53BDEB] -mr-0.5 font-bold" style={{ fontVariationSettings: "'FILL' 1" }}>done_all</span>
+                      <span className="text-[11px] text-slate-500">{mensagem.timestamp || horaAtual}</span>
+                      <span className="material-symbols-outlined text-[15px] text-[#00A884] -mr-0.5 font-bold" style={{ fontVariationSettings: "'FILL' 1" }}>done_all</span>
                     </div>
                   </div>
                 </div>
@@ -228,51 +276,37 @@ export function Chat() {
           </div>
 
           {/* Chat Input Dock */}
-          <footer className="z-20 flex shrink-0 items-center gap-2 border-t-0 bg-surface-container-high px-2.5 py-2 shadow-inner">
-            <div className="flex items-center text-outline">
-              <button type="button" aria-label="Inserir Emoji" className="rounded-full p-1.5 text-outline transition-colors hover:text-on-surface">
-                <span className="material-symbols-outlined text-[24px]">mood</span>
+          <footer className="z-20 shrink-0 border-t border-slate-200/80 bg-white px-3 py-2.5">
+            <form onSubmit={enviar} className="flex items-center gap-2">
+              <label htmlFor="mensagem" className="sr-only">Digite sua dúvida ou mensagem...</label>
+              <input
+                id="mensagem"
+                type="text"
+                value={texto}
+                onChange={(e) => setTexto(e.target.value)}
+                placeholder="Digite sua dúvida ou mensagem..."
+                maxLength={2000}
+                autoComplete="off"
+                className="flex-1 rounded-xl bg-[#F0F4F2] px-4 py-2.5 text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#081F26]"
+              />
+              <button
+                type="submit"
+                disabled={enviando || texto.trim() === ''}
+                aria-label={enviando ? 'Enviando...' : 'Enviar mensagem'}
+                aria-busy={enviando}
+                className="flex h-10 w-11 shrink-0 items-center justify-center rounded-xl bg-[#081F26] text-[#00E5C0] shadow-sm transition-all hover:bg-[#0E2830] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <span className="material-symbols-outlined text-[18px]">send</span>
               </button>
-              <button type="button" aria-label="Anexar Arquivo" className="-ml-1 rounded-full p-1.5 text-outline transition-colors hover:text-on-surface">
-                <span className="material-symbols-outlined text-[24px]">attach_file</span>
-              </button>
-            </div>
-            <form onSubmit={enviar} className="flex flex-1 items-center">
-              <div className="relative flex w-full items-center">
-                <label htmlFor="mensagem" className="sr-only">Sua mensagem</label>
-                <input
-                  id="mensagem"
-                  type="text"
-                  value={texto}
-                  onChange={(e) => setTexto(e.target.value)}
-                  placeholder="Digite uma mensagem..."
-                  maxLength={2000}
-                  autoComplete="off"
-                  className="w-full rounded-full bg-surface-container-lowest py-2.5 pl-4 pr-10 text-[14.2px] text-on-surface shadow-sm placeholder:text-outline focus:outline-none"
-                />
-                <button type="button" aria-label="Câmera" className="absolute right-3 text-outline transition-colors hover:text-on-surface">
-                  <span className="material-symbols-outlined text-[20px]">photo_camera</span>
-                </button>
-              </div>
             </form>
-            <button
-              type="submit"
-              onClick={enviar}
-              disabled={enviando || texto.trim() === ''}
-              aria-label={enviando ? 'Enviando...' : 'Enviar mensagem'}
-              aria-busy={enviando}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary text-on-secondary shadow-md transition-all hover:bg-primary active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span className="material-symbols-outlined text-[20px]">send</span>
-            </button>
           </footer>
         </div>
 
-        {/* Subtitle / Footer Meta */}
-        <div className="mt-3 hidden px-4 text-center md:block">
-          <p className="text-[11px] font-medium tracking-wide text-outline-variant">
-            TLC Soluções • Tecnologia que Conecta e Transforma • Atendimento 24/7
-          </p>
+        {/* Subtitle / Footer Meta Pill */}
+        <div className="mt-3.5 px-4 text-center">
+          <span className="inline-block rounded-full bg-white px-4 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 shadow-sm border border-slate-200/70">
+            TLC Soluções • <span className="font-semibold text-slate-700">Tecnologia que Conecta e Transforma</span> • Atendimento 24/7
+          </span>
         </div>
       </div>
     </main>
