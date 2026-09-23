@@ -16,17 +16,31 @@ describe('buildSystemPrompt', () => {
     expect(prompt).toContain('uma pergunta por mensagem')
   })
 
-  it('carrega os cinco estágios do roteiro', () => {
-    const estagios = [
+  it('carrega os pontos do roteiro', () => {
+    const pontos = [
+      'O nome dela',
       'Que negócio é o dela',
-      'Que tarefa se repete toda semana',
-      'Quanto tempo por semana isso toma',
-      'O que ela usa hoje',
-      'O nome dela e o melhor contato',
+      'Por onde o cliente dela chega',
+      'Onde o atendimento trava',
+      'Quanto isso custa',
+      'Um contato usável dela',
     ]
-    for (const estagio of estagios) {
-      expect(prompt).toContain(estagio)
+    for (const ponto of pontos) {
+      expect(prompt).toContain(ponto)
     }
+  })
+
+  it('manda perguntar o nome antes de qualquer outra pergunta', () => {
+    expect(prompt).toContain('antes de qualquer outra pergunta')
+  })
+
+  it('exige contato usável, não uma promessa de contato', () => {
+    expect(prompt).toContain('"Me chama no WhatsApp" não é um contato')
+    expect(prompt).toContain('"Manda um e-mail" não é um contato')
+  })
+
+  it('foca a conversa em atendimento ao cliente', () => {
+    expect(prompt).toContain('A TLC resolve atendimento ao cliente')
   })
 
   it('não cita valor em reais, nem símbolo nem por extenso', () => {
