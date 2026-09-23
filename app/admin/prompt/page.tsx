@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { BotaoRestaurar } from '@/components/botao-restaurar'
 import { EditorPrompt } from '@/components/editor-prompt'
+import { ProporPrompt } from '@/components/propor-prompt'
 import { listPromptVersions } from '@/lib/db'
 import { SYSTEM_PADRAO } from '@/lib/prompt'
 
@@ -38,7 +39,8 @@ export default async function PaginaPrompt() {
 
       <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_452px]">
         <div className="flex flex-col gap-8">
-          <EditorPrompt inicial={atual} />
+          <EditorPrompt key={versoes[0]?.id ?? 'padrao'} inicial={atual} />
+          <ProporPrompt atual={atual} />
         </div>
 
         <aside className="flex flex-col gap-4">
