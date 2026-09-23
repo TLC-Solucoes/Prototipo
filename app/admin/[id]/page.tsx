@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { BotaoApagar } from '@/components/botao-apagar'
 import { BotaoResumo } from '@/components/botao-resumo'
 import { getConversation, listMessages } from '@/lib/db'
 import { hashTranscript } from '@/lib/hash'
@@ -61,9 +62,18 @@ export default async function Conversa({
             {conversa.contactPhone ?? conversa.contactEmail ?? '—'}
           </span>
         </div>
-        <span className="text-[13px] text-[#6F6A62]">
-          {mensagens.length} mensagens
-        </span>
+        <div className="flex flex-wrap items-center justify-end gap-4">
+          <span className="text-[13px] text-[#6F6A62]">
+            {mensagens.length} mensagens
+          </span>
+          <BotaoApagar
+            id={id}
+            nome={conversa.contactName}
+            segmento={resumo?.segmento ?? null}
+            mensagens={mensagens.length}
+            voltarPara="/admin"
+          />
+        </div>
       </header>
 
       <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_452px]">

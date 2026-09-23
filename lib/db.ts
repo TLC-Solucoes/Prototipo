@@ -5,6 +5,8 @@ import type {
   Conversation,
   ConversationSlot,
   Message,
+  PromptOrigem,
+  PromptVersion,
   Role,
   Summary,
 } from '@/lib/types'
@@ -156,6 +158,7 @@ export async function listConversations(limit: number): Promise<AdminRow[]> {
   const rows = await sql`
     select c.id, c.created_at, c.status, c.contact_name, c.contact_email,
            c.contact_phone, c.summary ->> 'dorPrincipal' as dor_principal,
+           c.summary ->> 'segmento' as segmento,
            c.summary is not null as tem_resumo,
            (c.summary_input_hash is null
             or c.transcript_hash is null
@@ -173,6 +176,7 @@ export async function listConversations(limit: number): Promise<AdminRow[]> {
     contactEmail: r.contact_email,
     contactPhone: r.contact_phone,
     dorPrincipal: r.dor_principal,
+    segmento: r.segmento,
     messageCount: r.message_count,
     temResumo: r.tem_resumo,
     desatualizado: r.desatualizado,
@@ -188,6 +192,54 @@ export async function claimSummarySlot(
      where id = ${conversationId}
        and (summary_attempted_at is null
             or summary_attempted_at < now() - make_interval(secs => ${cooldownSeconds}))
+    returning id
+  `
+  return rows.length > 0
+}
+
+export async function deleteConversation(id: string): Promise<boolean> {
+  const rows = await sql`delete from conversation where id = ${id} returning id`
+  return rows.length > 0
+}
+
+export async function latestPromptVersion(): Promise<string | null> {
+  const rows = await sql`
+    select conteudo from prompt_versao order by id desc limit 1
+  `
+  return rows.length > 0 ? (rows[0].conteudo as string) : null
+}
+
+export async function listPromptVersions(limit: number): Promise<PromptVersion[]> {
+  const rows = await sql`
+    select id, conteudo, criado_em, origem, pedido
+      from prompt_versao order by id desc limit ${limit}
+  `
+  return rows.map((r) => ({
+    id: Number(r.id),
+    conteudo: r.conteudo,
+    criadoEm: new Date(r.criado_em),
+    origem: r.origem as PromptOrigem,
+    pedido: r.pedido,
+  }))
+}
+
+export async function insertPromptVersion(
+  conteudo: string,
+  origem: PromptOrigem,
+  pedido: string | null,
+): Promise<number> {
+  const rows = await sql`
+    insert into prompt_versao (conteudo, origem, pedido)
+    values (${conteudo}, ${origem}, ${pedido})
+    returning id
+  `
+  return Number(rows[0].id)
+}
+
+export async function restorePromptVersion(id: number): Promise<boolean> {
+  const rows = await sql`
+    insert into prompt_versao (conteudo, origem, pedido)
+    select conteudo, origem, pedido from prompt_versao where id = ${id}
     returning id
   `
   return rows.length > 0

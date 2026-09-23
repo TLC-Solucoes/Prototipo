@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { BotaoApagar } from '@/components/botao-apagar'
 import { BotaoResumo } from '@/components/botao-resumo'
 import { listConversations } from '@/lib/db'
 
@@ -27,26 +28,34 @@ export default async function Painel() {
             Conversas
           </h1>
         </div>
-        <dl className="flex gap-8">
-          <div className="flex flex-col items-end gap-0.5">
-            <dd className="font-[family-name:var(--font-display)] text-[27px] font-semibold">
-              {conversas.length}
-            </dd>
-            <dt className="text-[12px] text-[#A19A8E]">conversas</dt>
-          </div>
-          <div className="flex flex-col items-end gap-0.5">
-            <dd className="font-[family-name:var(--font-display)] text-[27px] font-semibold text-[#E5924F]">
-              {comContato}
-            </dd>
-            <dt className="text-[12px] text-[#A19A8E]">com contato</dt>
-          </div>
-          <div className="flex flex-col items-end gap-0.5">
-            <dd className="font-[family-name:var(--font-display)] text-[27px] font-semibold">
-              {semResumo}
-            </dd>
-            <dt className="text-[12px] text-[#A19A8E]">sem resumo</dt>
-          </div>
-        </dl>
+        <div className="flex items-end gap-8">
+          <Link
+            href="/admin/prompt"
+            className="text-[14px] font-semibold text-[#E08C55]"
+          >
+            Prompt
+          </Link>
+          <dl className="flex gap-8">
+            <div className="flex flex-col items-end gap-0.5">
+              <dd className="font-[family-name:var(--font-display)] text-[27px] font-semibold">
+                {conversas.length}
+              </dd>
+              <dt className="text-[12px] text-[#A19A8E]">conversas</dt>
+            </div>
+            <div className="flex flex-col items-end gap-0.5">
+              <dd className="font-[family-name:var(--font-display)] text-[27px] font-semibold text-[#E5924F]">
+                {comContato}
+              </dd>
+              <dt className="text-[12px] text-[#A19A8E]">com contato</dt>
+            </div>
+            <div className="flex flex-col items-end gap-0.5">
+              <dd className="font-[family-name:var(--font-display)] text-[27px] font-semibold">
+                {semResumo}
+              </dd>
+              <dt className="text-[12px] text-[#A19A8E]">sem resumo</dt>
+            </div>
+          </dl>
+        </div>
       </header>
 
       <ul className="mt-2">
@@ -97,6 +106,12 @@ export default async function Painel() {
             >
               Abrir
             </Link>
+            <BotaoApagar
+              id={conversa.id}
+              nome={conversa.contactName}
+              segmento={conversa.segmento}
+              mensagens={conversa.messageCount}
+            />
           </li>
         ))}
       </ul>
