@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { BotaoApagar } from '@/components/botao-apagar'
 import { BotaoResumo } from '@/components/botao-resumo'
 import { listConversations } from '@/lib/db'
 
@@ -97,6 +98,12 @@ export default async function Painel() {
             >
               Abrir
             </Link>
+            <BotaoApagar
+              id={conversa.id}
+              nome={conversa.contactName}
+              segmento={conversa.segmento}
+              mensagens={conversa.messageCount}
+            />
           </li>
         ))}
       </ul>

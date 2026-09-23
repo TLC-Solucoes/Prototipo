@@ -48,6 +48,7 @@ export type AdminRow = {
   contactEmail: string | null
   contactPhone: string | null
   dorPrincipal: string | null
+  segmento: string | null
   messageCount: number
   temResumo: boolean
   desatualizado: boolean

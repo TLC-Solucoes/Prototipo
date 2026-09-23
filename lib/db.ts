@@ -156,6 +156,7 @@ export async function listConversations(limit: number): Promise<AdminRow[]> {
   const rows = await sql`
     select c.id, c.created_at, c.status, c.contact_name, c.contact_email,
            c.contact_phone, c.summary ->> 'dorPrincipal' as dor_principal,
+           c.summary ->> 'segmento' as segmento,
            c.summary is not null as tem_resumo,
            (c.summary_input_hash is null
             or c.transcript_hash is null
@@ -173,6 +174,7 @@ export async function listConversations(limit: number): Promise<AdminRow[]> {
     contactEmail: r.contact_email,
     contactPhone: r.contact_phone,
     dorPrincipal: r.dor_principal,
+    segmento: r.segmento,
     messageCount: r.message_count,
     temResumo: r.tem_resumo,
     desatualizado: r.desatualizado,
@@ -190,5 +192,10 @@ export async function claimSummarySlot(
             or summary_attempted_at < now() - make_interval(secs => ${cooldownSeconds}))
     returning id
   `
+  return rows.length > 0
+}
+
+export async function deleteConversation(id: string): Promise<boolean> {
+  const rows = await sql`delete from conversation where id = ${id} returning id`
   return rows.length > 0
 }
