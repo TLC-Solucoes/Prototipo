@@ -12,7 +12,7 @@ export const SUMMARY_INSTRUCTION = `Leia a conversa abaixo entre um consultor da
   "responsavel": "quem faz a tarefa hoje, ou null",
   "consequencia": "o que acontece quando falha, ou null",
   "ferramentas": ["ferramentas citadas"],
-  "urgencia": "alta, media, baixa ou null",
+  "urgencia": "alta, media, baixa ou null — infira dos sinais: alta quando a pessoa citou cliente perdido, venda que não fechou ou disse que precisa resolver logo; media quando descreveu incômodo que se repete sem perda declarada; baixa quando contou sem demonstrar incômodo. Use null só se a conversa não der sinal nenhum",
   "adequacaoIcp": "sim, nao ou incerto",
   "contato": { "nome": null, "email": null, "telefone": null }
 }
