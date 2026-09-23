@@ -119,50 +119,6 @@ export function Chat() {
     }
   }
 
-  const acoesRapidas = [
-    { label: 'Conhecer Soluções e Serviços', icon: 'business_center' },
-    { label: 'Falar com um Especialista', icon: 'rocket_launch' },
-    { label: 'Solicitar Orçamento', icon: 'trending_up' },
-    { label: 'Dúvidas Frequentes', icon: 'help_outline' },
-  ]
-
-  const enviarAcaoRapida = (label: string) => {
-    if (enviando) return
-    const hora = formatarHora()
-    setEnviando(true)
-    setMensagens((atuais) => [
-      ...atuais,
-      { role: 'user', content: label, timestamp: hora },
-      { role: 'assistant', content: '', timestamp: hora },
-    ])
-
-    let acumulado = ''
-    fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: label }),
-    })
-      .then(async (resposta) => {
-        if (!resposta.ok || !resposta.body) {
-          trocarUltima(FALHA)
-          return
-        }
-        const leitor = resposta.body.getReader()
-        const decodificador = new TextDecoder()
-        for (;;) {
-          const { done, value } = await leitor.read()
-          if (done) break
-          acumulado += decodificador.decode(value, { stream: true })
-          trocarUltima(acumulado)
-        }
-      })
-      .catch(() => trocarUltima(FALHA))
-      .finally(() => {
-        setEnviando(false)
-        agendarResumo()
-      })
-  }
-
   return (
     <main className="relative flex min-h-screen w-full items-center justify-center bg-[#E8ECE9] font-sans antialiased p-0 md:p-6 lg:p-8">
       <div className="flex w-full flex-col items-center justify-center">
@@ -240,25 +196,6 @@ export function Chat() {
                     </div>
                   </div>
 
-                  {/* Quick Action Chips directly after first assistant message */}
-                  {indice === 0 && (
-                    <div className="mt-2.5 flex w-full flex-col gap-2">
-                      {acoesRapidas.map((acao, i) => (
-                        <button
-                          key={i}
-                          type="button"
-                          onClick={() => enviarAcaoRapida(acao.label)}
-                          className="flex items-center justify-between w-full rounded-xl bg-white px-3.5 py-2.5 text-left text-[13.5px] font-medium text-slate-700 shadow-sm border border-slate-200/80 transition-all hover:bg-slate-50 hover:border-emerald-500/40 active:scale-[0.99]"
-                        >
-                          <div className="flex items-center gap-2.5">
-                            <span className="material-symbols-outlined text-[18px] text-[#081F26]">{acao.icon}</span>
-                            <span>{acao.label}</span>
-                          </div>
-                          <span className="material-symbols-outlined text-[16px] text-slate-400">chevron_right</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
                 </div>
               ) : (
                 <div key={indice} className="flex w-full flex-col items-end my-1">
